@@ -1,6 +1,7 @@
 # AI Rules for {{project-name}}
 
-{{project-description}}
+MyFilms to aplikacja webowa dla miłośników kina, która pomaga odkrywać nowe filmy i seriale dzięki spersonalizowanym rekomendacjom AI. Użytkownicy mogą wyszukiwać filmy (przez TMDb API), oceniać je w skali 1-10 i tworzyć osobiste listy ("Do obejrzenia",
+"Ulubione", "Ocenione"). Po ocenieniu minimum 10 filmów system generuje dopasowane rekomendacje na podstawie historii ocen i opcjonalnego promptu tekstowego.
 
 ## Tech Stack
 

@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 interface Props {
   title?: string;
@@ -16,8 +17,21 @@ const { title = "10x Astro Starter" } = Astro.props;
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <!-- Prevent flash of unstyled content (FOUC) for dark mode -->
+    <script is:inline>
+      (function() {
+        const savedTheme = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = savedTheme === "dark" || (!savedTheme && prefersDark) ? "dark" : "light";
+
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
   <body>
+    <ThemeToggle client:load />
     <slot />
   </body>
 </html>

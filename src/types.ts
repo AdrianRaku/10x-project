@@ -72,6 +72,7 @@ export type RecommendationDto = {
   tmdb_id: number;
   title: string;
   year: number;
+  posterPath: string | null;
 };
 
 // #endregion

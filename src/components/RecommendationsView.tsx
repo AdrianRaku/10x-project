@@ -47,6 +47,7 @@ export function RecommendationsView({
                 tmdb_id={movie.tmdb_id}
                 title={movie.title}
                 year={movie.year}
+                posterPath={movie.posterPath}
               />
             ))}
           </div>

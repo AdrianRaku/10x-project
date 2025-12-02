@@ -1,0 +1,159 @@
+import { useState, useCallback, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { UserPlus, Loader2, CheckCircle2 } from "lucide-react";
+
+export function RegisterForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      // Reset errors and success
+      setErrors({});
+      setIsSuccess(false);
+
+      // Client-side validation
+      const newErrors: { email?: string; password?: string } = {};
+
+      if (!email.trim()) {
+        newErrors.email = "Adres e-mail jest wymagany";
+      } else if (!validateEmail(email)) {
+        newErrors.email = "Adres e-mail jest nieprawidłowy";
+      }
+
+      if (!password) {
+        newErrors.password = "Hasło jest wymagane";
+      } else if (password.length < 8) {
+        newErrors.password = "Hasło musi mieć co najmniej 8 znaków";
+      }
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          setErrors({ form: data.message || "Nie udało się utworzyć konta" });
+          return;
+        }
+
+        setIsSuccess(true);
+      } catch {
+        setErrors({ form: "Wystąpił błąd podczas rejestracji. Spróbuj ponownie." });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [email, password]
+  );
+
+  if (isSuccess) {
+    return (
+      <div className="space-y-6 text-center">
+        <div className="flex justify-center">
+          <div className="rounded-full bg-green-100 p-3 dark:bg-green-900/20">
+            <CheckCircle2 className="size-8 text-green-600 dark:text-green-500" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold">Sprawdź swoją skrzynkę e-mail</h2>
+          <p className="text-muted-foreground">
+            Wysłaliśmy wiadomość na adres <strong className="text-foreground">{email}</strong>. Kliknij w link, aby
+            potwierdzić rejestrację.
+          </p>
+        </div>
+        <Button asChild variant="outline" className="w-full">
+          <a href="/login">Powrót do logowania</a>
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">E-mail</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="twoj@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            aria-invalid={!!errors.email}
+            className={errors.email ? "border-destructive" : ""}
+          />
+          {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">Hasło</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            aria-invalid={!!errors.password}
+            className={errors.password ? "border-destructive" : ""}
+          />
+          {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+          <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 8 znaków</p>
+        </div>
+      </div>
+
+      {errors.form && (
+        <div className="rounded-lg border border-destructive bg-destructive/10 p-3">
+          <p className="text-sm text-destructive">{errors.form}</p>
+        </div>
+      )}
+
+      <Button type="submit" disabled={isLoading} className="w-full">
+        {isLoading ? (
+          <>
+            <Loader2 className="animate-spin" />
+            Tworzenie konta...
+          </>
+        ) : (
+          <>
+            <UserPlus />
+            Zarejestruj się
+          </>
+        )}
+      </Button>
+
+      <div className="text-center">
+        <span className="text-sm text-muted-foreground">Masz już konto? </span>
+        <a href="/login" className="text-sm font-medium hover:underline">
+          Zaloguj się
+        </a>
+      </div>
+    </form>
+  );
+}

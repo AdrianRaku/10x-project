@@ -1,0 +1,29 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { RegisterForm } from "../components/RegisterForm";
+
+// TODO: Po implementacji middleware, sprawdzić czy użytkownik jest zalogowany
+// i przekierować na stronę główną:
+// if (Astro.locals.user) {
+//   return Astro.redirect("/");
+// }
+---
+
+<Layout title="Rejestracja - MyFilms">
+  <main class="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md space-y-8">
+      <!-- Header -->
+      <div class="text-center">
+        <h1 class="text-3xl font-bold tracking-tight">Dołącz do MyFilms</h1>
+        <p class="mt-2 text-muted-foreground">
+          Odkrywaj filmy i otrzymuj spersonalizowane rekomendacje AI
+        </p>
+      </div>
+
+      <!-- Register Form Card -->
+      <div class="rounded-lg border bg-card p-6 shadow-sm">
+        <RegisterForm client:load />
+      </div>
+    </div>
+  </main>
+</Layout>

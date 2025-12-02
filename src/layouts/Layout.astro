@@ -1,12 +1,20 @@
 ---
 import "../styles/global.css";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { UserMenu } from "../components/UserMenu";
+import { Button } from "../components/ui/button";
 
 interface Props {
   title?: string;
 }
 
-const { title = "10x Astro Starter" } = Astro.props;
+const { title = "MyFilms" } = Astro.props;
+
+// TODO: Po implementacji middleware, odkomentować:
+// const user = Astro.locals.user;
+
+// Tymczasowo symulujemy brak zalogowanego użytkownika
+const user = null;
 ---
 
 <!doctype html>
@@ -31,7 +39,38 @@ const { title = "10x Astro Starter" } = Astro.props;
     </script>
   </head>
   <body>
-    <ThemeToggle client:load />
+    <!-- Header with navigation -->
+    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div class="container flex h-14 items-center justify-between px-4">
+        <div class="flex items-center gap-2">
+          <a href="/" class="flex items-center gap-2 font-semibold">
+            <span class="text-xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              MyFilms
+            </span>
+          </a>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <ThemeToggle client:load />
+
+          {user ? (
+            <UserMenu
+              client:load
+              userEmail={user.email}
+              userName={user.user_metadata?.name}
+            />
+          ) : (
+            <Button asChild size="sm">
+              <a href="/login">
+                Zaloguj się
+              </a>
+            </Button>
+          )}
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
     <slot />
   </body>
 </html>

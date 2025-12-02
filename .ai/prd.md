@@ -54,7 +54,7 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-003
 - Tytuł: Wyszukiwanie filmów
-- Opis: Jako użytkownik, chcę móc wyszukać filmy po tytule, aby je znaleźć i ocenić.
+- Opis: Jako zalogowany użytkownik, chcę móc wyszukać filmy po tytule, aby je znaleźć i ocenić.
 - Kryteria akceptacji:
     - 1. Na stronie głównej znajduje się pole wyszukiwania.
     - 2. Po wpisaniu frazy i zainicjowaniu wyszukiwania, aplikacja odpytuje API TMDb.
@@ -63,7 +63,7 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-004
 - Tytuł: Ocenianie filmu
-- Opis: Jako użytkownik, chcę móc ocenić film w skali 1-10, aby zapisać moją opinię i budować profil preferencji dla systemu rekomendacji.
+- Opis: Jako zalogowany użytkownik, chcę móc ocenić film w skali 1-10, aby zapisać moją opinię i budować profil preferencji dla systemu rekomendacji.
 - Kryteria akceptacji:
     - 1. Z poziomu wyników wyszukiwania lub strony szczegółów mogę ocenić film.
     - 2. Po zainicjowaniu oceny, pojawia się interfejs do wyboru oceny od 1 do 10.
@@ -72,7 +72,7 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-005
 - Tytuł: Onboarding nowego użytkownika do rekomendacji
-- Opis: Jako nowy użytkownik, który nie ocenił jeszcze 10 filmów, chcę zobaczyć ekran powitalny, który poinformuje mnie, co muszę zrobić, aby odblokować rekomendacje.
+- Opis: Jako nowy  zalogowany użytkownik, który nie ocenił jeszcze 10 filmów, chcę zobaczyć ekran powitalny, który poinformuje mnie, co muszę zrobić, aby odblokować rekomendacje.
 - Kryteria akceptacji:
     - 1. Po zalogowaniu, jeśli mam mniej niż 10 ocenionych filmów, widzę ekran powitalny.
     - 2. Ekran zawiera komunikat "Witaj! Aby otrzymać pierwszą rekomendację, wyszukaj i oceń co najmniej 10 filmów".
@@ -80,17 +80,17 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-006
 - Tytuł: Generowanie rekomendacji AI
-- Opis: Jako użytkownik, który ocenił co najmniej 10 filmów, chcę móc wygenerować spersonalizowane rekomendacje filmowe.
+- Opis: Jako zalogowany użytkownik, który ocenił co najmniej 10 filmów, chcę móc wygenerować spersonalizowane rekomendacje filmowe.
 - Kryteria akceptacji:
     - 1. Gdy mam 10 lub więcej ocen, na stronie głównej widoczny jest przycisk "Zaproponuj coś dla mnie" i opcjonalne pole na prompt tekstowy.
     - 2. Po kliknięciu przycisku, system wysyła do AI moje oceny (tytuł, rok, ocena) i opcjonalny prompt.
     - 3. Aplikacja wyświetla 5 rekomendacji w formie kafelków.
     - 4. Rekomendacje nie zawierają filmów, które już oceniłem.
-    - 5. Próba wygenerowania rekomendacji po przekroczeniu dziennego limitu (3) skutkuje wyświetleniem odpowiedniego komunikatu.
+    - 5. Próba wygenerowania rekomendacji po przekroczeniu dziennego limitu (5) skutkuje wyświetleniem odpowiedniego komunikatu.
 
 - ID: US-007
 - Tytuł: Zarządzanie listą "Do obejrzenia"
-- Opis: Jako użytkownik, chcę móc dodawać filmy do listy "Do obejrzenia" i usuwać je z niej, aby śledzić tytuły, które planuję obejrzeć.
+- Opis: Jako zalogowany użytkownik, chcę móc dodawać filmy do listy "Do obejrzenia" i usuwać je z niej, aby śledzić tytuły, które planuję obejrzeć.
 - Kryteria akceptacji:
     - 1. Na kafelku filmu (w rekomendacjach, wyszukiwaniu) oraz na stronie szczegółów znajduje się przycisk "Do obejrzenia".
     - 2. Kliknięcie przycisku dodaje film do listy "Do obejrzenia" i zmienia stan przycisku (np. ikonę).
@@ -99,7 +99,7 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-008
 - Tytuł: Zarządzanie listą "Ulubione"
-- Opis: Jako użytkownik, chcę móc oznaczać filmy jako "ulubione", aby stworzyć kolekcję moich najlepszych tytułów.
+- Opis: Jako zalogowany użytkownik, chcę móc oznaczać filmy jako "ulubione", aby stworzyć kolekcję moich najlepszych tytułów.
 - Kryteria akceptacji:
     - 1. Na kafelku filmu oraz na stronie szczegółów znajduje się przycisk "Dodaj do ulubionych" (np. serduszko).
     - 2. Kliknięcie przycisku dodaje film do listy "Ulubione".
@@ -108,7 +108,7 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-009
 - Tytuł: Przeglądanie strony szczegółów filmu
-- Opis: Jako użytkownik, chcę móc zobaczyć szczegółowe informacje o filmie, klikając na jego kafelek.
+- Opis: Jako zalogowany użytkownik, chcę móc zobaczyć szczegółowe informacje o filmie, klikając na jego kafelek.
 - Kryteria akceptacji:
     - 1. Kliknięcie na kafelek filmu (z wyszukiwania, listy, rekomendacji) przenosi mnie na stronę szczegółów tego filmu.
     - 2. Strona szczegółów wyświetla plakat, opis, średnią ocenę (jeśli dostępna) oraz przyciski akcji ("Oceń", "Do obejrzenia", "Ulubione").
@@ -116,14 +116,43 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-010
 - Tytuł: Obsługa błędów API
-- Opis: Jako użytkownik, chcę być informowany o problemach technicznych w sposób, który nie psuje mojego doświadczenia.
+- Opis: Jako zalogowany użytkownik, chcę być informowany o problemach technicznych w sposób, który nie psuje mojego doświadczenia.
 - Kryteria akceptacji:
     - 1. Jeśli API AI zwróci błąd podczas generowania rekomendacji, widzę komunikat "Wystąpił chwilowy błąd. Spróbuj ponownie za chwilę".
     - 2. Nieudane zapytanie z powodu błędu technicznego nie zużywa mojego dziennego limitu rekomendacji.
     - 3. Jeśli AI zwróci tytuł, którego nie ma w bazie TMDb, jest on po cichu odrzucany, a system stara się, abym zawsze otrzymał 5 prawidłowych rekomendacji.
+
+- ID: US-011
+- Tytuł: Przekierowanie niezalogowanych użytkowników
+- Opis: Jako niezalogowany użytkownik, chcę być przekierowany na stronę logowania, gdy próbuję uzyskać dostęp do funkcji wymagających uwierzytelnienia.
+- Kryteria akceptacji:
+     - 1. Próba dostępu do strony ze szczegółami filmu kończy się przekierowaniem na stronę logowania.
+     - 2. Próba wysłania zapytania o rekomendacje kończy się przekierowaniem na stronę logowania.
+     - 3. Próba zarządzania listami kończy się przekierowaniem na stronę logowania.
+- ID: US-012
+- Tytuł: Wylogowanie użytkownika
+- Opis: Jako zalogowany użytkownik, chcę móc się wylogować, aby zabezpieczyć moje konto.
+- Kryteria akceptacji:
+-    1. Na każdej stronie aplikacji znajduje się przycisk "Wyloguj".
+    - 2. Po kliknięciu przycisku, użytkownik jest wylogowany, a jego sesja jest zakończona.
+    - 3. Użytkownik jest przekierowany na stronę logowania po wylogowaniu.
+- ID: US-013
+- Tytuł: Odzyskiwanie hasła
+- Opis: Jako użytkownik, który zapomniał hasła, chcę móc je odzyskać, aby ponownie uzyskać dostęp do mojego konta.
+- Kryteria akceptacji:
+    - 1. Na stronie logowania znajduje się link "Zapomniałem hasła".
+    - 2. Po kliknięciu linku, użytkownik jest przekierowany na stronę odzyskiwania hasła.
+    - 3. Użytkownik może wprowadzić swój adres e-mail, aby otrzymać instrukcje dotyczące resetowania hasła.
+    - 4. Po pomyślnym zresetowaniu hasła, użytkownik może zalogować się przy użyciu nowego hasła.
 
 ## 6. Metryki sukcesu
 - 6.1. Aktywacja użytkowników: Liczba użytkowników, którzy ocenili co najmniej 10 filmów.
 - 6.2. Zaangażowanie: Średnia liczba ocenionych filmów na aktywnego użytkownika oraz stosunek liczby filmów dodanych do list z rekomendacji do liczby wygenerowanych rekomendacji.
 
 
+## 7. Bezpieczny dostęp i uwierzytelnianie
+- 7.1. Tylko zalogowani użytkownicy mogą korzystać z serwisu.
+- 7.2. Wszystkie operacje związane z ocenianiem filmów, zarządzaniem listami i generowaniem rekomendacji wymagają uwierzytelnienia.
+- 7.3. Niezalogowani użytkownicy są przekierowywani na stronę logowania/rejestracji.
+- 7.4. Użytkownik może się wylogować z systemu poprzez przycisk "Wyloguj" w prawym górnym rogu interfejsu.
+- 7.5. Odzyskiwanie hasła powinno być możliwe poprzez funkcję "Zapomniałem hasła" na stronie logowania.

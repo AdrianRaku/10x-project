@@ -2,14 +2,14 @@ import { useState, useCallback, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserPlus, Loader2, CheckCircle2 } from "lucide-react";
+import { UserPlus, Loader2, Mail } from "lucide-react";
 
 export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,9 +20,8 @@ export function RegisterForm() {
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      // Reset errors and success
+      // Reset errors
       setErrors({});
-      setIsSuccess(false);
 
       // Client-side validation
       const newErrors: { email?: string; password?: string } = {};
@@ -35,8 +34,8 @@ export function RegisterForm() {
 
       if (!password) {
         newErrors.password = "Hasło jest wymagane";
-      } else if (password.length < 8) {
-        newErrors.password = "Hasło musi mieć co najmniej 8 znaków";
+      } else if (password.length < 6) {
+        newErrors.password = "Hasło musi mieć co najmniej 6 znaków";
       }
 
       if (Object.keys(newErrors).length > 0) {
@@ -55,13 +54,15 @@ export function RegisterForm() {
           body: JSON.stringify({ email, password }),
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-          const data = await response.json();
           setErrors({ form: data.message || "Nie udało się utworzyć konta" });
           return;
         }
 
-        setIsSuccess(true);
+        // Show success message with email confirmation instruction
+        setSuccessMessage(data.message);
       } catch {
         setErrors({ form: "Wystąpił błąd podczas rejestracji. Spróbuj ponownie." });
       } finally {
@@ -71,24 +72,46 @@ export function RegisterForm() {
     [email, password]
   );
 
-  if (isSuccess) {
+  // Show success message if registration was successful
+  if (successMessage) {
     return (
-      <div className="space-y-6 text-center">
-        <div className="flex justify-center">
-          <div className="rounded-full bg-green-100 p-3 dark:bg-green-900/20">
-            <CheckCircle2 className="size-8 text-green-600 dark:text-green-500" />
+      <div className="space-y-6">
+        <div className="rounded-lg border border-green-500 bg-green-50 dark:bg-green-950 p-6">
+          <div className="flex items-start gap-4">
+            <div className="rounded-full bg-green-100 dark:bg-green-900 p-3">
+              <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="flex-1 space-y-2">
+              <h3 className="font-semibold text-green-900 dark:text-green-100">
+                Rejestracja prawie ukończona!
+              </h3>
+              <p className="text-sm text-green-800 dark:text-green-200">{successMessage}</p>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                Po kliknięciu w link aktywacyjny będziesz mógł się zalogować.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold">Sprawdź swoją skrzynkę e-mail</h2>
-          <p className="text-muted-foreground">
-            Wysłaliśmy wiadomość na adres <strong className="text-foreground">{email}</strong>. Kliknij w link, aby
-            potwierdzić rejestrację.
+
+        <div className="rounded-lg border bg-muted p-4">
+          <p className="text-sm text-muted-foreground">
+            <strong>Lokalny development:</strong> Sprawdź emaile w Mailpit pod adresem{" "}
+            <a
+              href="http://127.0.0.1:54324"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground hover:underline"
+            >
+              http://127.0.0.1:54324
+            </a>
           </p>
         </div>
-        <Button asChild variant="outline" className="w-full">
-          <a href="/login">Powrót do logowania</a>
-        </Button>
+
+        <div className="text-center">
+          <a href="/login" className="text-sm font-medium hover:underline">
+            Przejdź do logowania
+          </a>
+        </div>
       </div>
     );
   }
@@ -124,7 +147,7 @@ export function RegisterForm() {
             className={errors.password ? "border-destructive" : ""}
           />
           {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-          <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 8 znaków</p>
+          <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 6 znaków</p>
         </div>
       </div>
 

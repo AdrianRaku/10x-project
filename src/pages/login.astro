@@ -2,11 +2,12 @@
 import Layout from "../layouts/Layout.astro";
 import { LoginForm } from "../components/LoginForm";
 
-// TODO: Po implementacji middleware, sprawdzić czy użytkownik jest zalogowany
-// i przekierować na stronę główną:
-// if (Astro.locals.user) {
-//   return Astro.redirect("/");
-// }
+export const prerender = false;
+
+// Redirect logged-in users to home page
+if (Astro.locals.user) {
+  return Astro.redirect("/");
+}
 ---
 
 <Layout title="Logowanie - MyFilms">
@@ -15,9 +16,7 @@ import { LoginForm } from "../components/LoginForm";
       <!-- Header -->
       <div class="text-center">
         <h1 class="text-3xl font-bold tracking-tight">Witaj ponownie!</h1>
-        <p class="mt-2 text-muted-foreground">
-          Zaloguj się do swojego konta MyFilms
-        </p>
+        <p class="mt-2 text-muted-foreground">Zaloguj się do swojego konta MyFilms</p>
       </div>
 
       <!-- Login Form Card -->
@@ -30,12 +29,7 @@ import { LoginForm } from "../components/LoginForm";
         <span class="text-sm text-muted-foreground">
           Nie masz jeszcze konta?{" "}
         </span>
-        <a
-          href="/register"
-          class="text-sm font-medium hover:underline"
-        >
-          Zarejestruj się
-        </a>
+        <a href="/register" class="text-sm font-medium hover:underline"> Zarejestruj się </a>
       </div>
     </div>
   </main>

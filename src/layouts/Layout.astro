@@ -10,11 +10,8 @@ interface Props {
 
 const { title = "MyFilms" } = Astro.props;
 
-// TODO: Po implementacji middleware, odkomentować:
-// const user = Astro.locals.user;
-
-// Tymczasowo symulujemy brak zalogowanego użytkownika
-const user = null;
+// Get user from middleware
+const user = Astro.locals.user;
 ---
 
 <!doctype html>
@@ -27,7 +24,7 @@ const user = null;
     <title>{title}</title>
     <!-- Prevent flash of unstyled content (FOUC) for dark mode -->
     <script is:inline>
-      (function() {
+      (function () {
         const savedTheme = localStorage.getItem("theme");
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         const theme = savedTheme === "dark" || (!savedTheme && prefersDark) ? "dark" : "light";
@@ -40,7 +37,9 @@ const user = null;
   </head>
   <body>
     <!-- Header with navigation -->
-    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header
+      class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    >
       <div class="container flex h-14 items-center justify-between px-4">
         <div class="flex items-center gap-2">
           <a href="/" class="flex items-center gap-2 font-semibold">
@@ -53,19 +52,15 @@ const user = null;
         <div class="flex items-center gap-2">
           <ThemeToggle client:load />
 
-          {user ? (
-            <UserMenu
-              client:load
-              userEmail={user.email}
-              userName={user.user_metadata?.name}
-            />
-          ) : (
-            <Button asChild size="sm">
-              <a href="/login">
-                Zaloguj się
-              </a>
-            </Button>
-          )}
+          {
+            user ? (
+              <UserMenu client:load userEmail={user.email} />
+            ) : (
+              <Button asChild size="sm">
+                <a href="/login">Zaloguj się</a>
+              </Button>
+            )
+          }
         </div>
       </div>
     </header>

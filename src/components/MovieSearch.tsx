@@ -63,17 +63,11 @@ export function MovieSearch() {
           aria-label="Wyszukaj film"
         />
         {query.trim().length > 0 && query.trim().length < 5 && (
-          <p className="mt-1 text-xs text-muted-foreground">
-            Wpisz co najmniej 5 znaków, aby wyszukać
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">Wpisz co najmniej 5 znaków, aby wyszukać</p>
         )}
       </div>
 
-      {isLoading && (
-        <div className="text-center text-sm text-muted-foreground">
-          Wyszukiwanie...
-        </div>
-      )}
+      {isLoading && <div className="text-center text-sm text-muted-foreground">Wyszukiwanie...</div>}
 
       {error && (
         <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">

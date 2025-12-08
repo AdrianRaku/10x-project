@@ -4,16 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type RecommendationGeneratorProps = {
+interface RecommendationGeneratorProps {
   onRecommendationsGenerated: (recommendations: RecommendationDto[]) => void;
   recommendationsLimit: number;
   recommendationsUsed: number;
-};
+}
 
 export function RecommendationGenerator({
   onRecommendationsGenerated,
   recommendationsLimit,
-  recommendationsUsed
+  recommendationsUsed,
 }: RecommendationGeneratorProps) {
   const [prompt, setPrompt] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -81,10 +81,7 @@ export function RecommendationGenerator({
           <span className="text-sm text-muted-foreground">
             Wykorzystano: {recommendationsUsed} / {recommendationsLimit}
           </span>
-          <Button
-            type="submit"
-            disabled={isLoading || isLimitReached}
-          >
+          <Button type="submit" disabled={isLoading || isLimitReached}>
             {isLoading ? "Generowanie..." : "Zaproponuj coś dla mnie"}
           </Button>
         </div>

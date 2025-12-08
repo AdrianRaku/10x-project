@@ -2,18 +2,20 @@
 import Layout from "../layouts/Layout.astro";
 import { MainView } from "../components/MainView";
 
-// Get default user ID from environment
-const defaultUserId = import.meta.env.DEFAULT_USER_ID;
+export const prerender = false;
 
-if (!defaultUserId) {
-  throw new Error("DEFAULT_USER_ID environment variable is not set");
+// Get authenticated user from middleware
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
 }
 
 // Fetch user's ratings count from database
 const { data: ratings, error } = await Astro.locals.supabase
   .from("ratings")
   .select("tmdb_id")
-  .eq("user_id", defaultUserId);
+  .eq("user_id", user.id);
 
 if (error) {
   throw new Error(`Failed to fetch user ratings: ${error.message}`);
@@ -24,7 +26,7 @@ const ratingsCount = ratings?.length ?? 0;
 // Configuration
 const RATINGS_THRESHOLD = 10;
 const RECOMMENDATIONS_DAILY_LIMIT = 5;
-const username = "Użytkowniku"; // TODO: Fetch from user profile
+const username = user.email;
 ---
 
 <Layout title="MyFilms - Strona główna">

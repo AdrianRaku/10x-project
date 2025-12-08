@@ -5,19 +5,14 @@ import { RecommendationGenerator } from "./RecommendationGenerator";
 import { MovieCard } from "./MovieCard";
 import { Search, Sparkles } from "lucide-react";
 
-export type MainViewProps = {
+export interface MainViewProps {
   username: string;
   ratingsCount: number;
   ratingsThreshold: number;
   recommendationsLimit: number;
-};
+}
 
-export function MainView({
-  username,
-  ratingsCount,
-  ratingsThreshold,
-  recommendationsLimit
-}: MainViewProps) {
+export function MainView({ username, ratingsCount, ratingsThreshold, recommendationsLimit }: MainViewProps) {
   const [recommendations, setRecommendations] = useState<RecommendationDto[]>([]);
   const [recommendationsUsed, setRecommendationsUsed] = useState<number>(0);
 
@@ -25,7 +20,7 @@ export function MainView({
 
   const handleRecommendationsGenerated = (newRecommendations: RecommendationDto[]) => {
     setRecommendations(newRecommendations);
-    setRecommendationsUsed(prev => prev + 1);
+    setRecommendationsUsed((prev) => prev + 1);
   };
 
   return (
@@ -42,8 +37,8 @@ export function MainView({
         ) : (
           <div className="space-y-2">
             <p className="text-muted-foreground">
-              Oceń co najmniej <span className="font-semibold text-foreground">{ratingsThreshold}</span> filmów,
-              aby odblokować spersonalizowane rekomendacje AI
+              Oceń co najmniej <span className="font-semibold text-foreground">{ratingsThreshold}</span> filmów, aby
+              odblokować spersonalizowane rekomendacje AI
             </p>
             <div className="flex items-center justify-center gap-2">
               <div className="h-2 w-64 overflow-hidden rounded-full bg-muted">

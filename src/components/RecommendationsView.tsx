@@ -3,29 +3,24 @@ import type { RecommendationDto } from "../types";
 import { RecommendationGenerator } from "./RecommendationGenerator";
 import { MovieCard } from "./MovieCard";
 
-export type RecommendationsViewProps = {
+export interface RecommendationsViewProps {
   username: string;
   recommendationsLimit: number;
-};
+}
 
-export function RecommendationsView({
-  username,
-  recommendationsLimit
-}: RecommendationsViewProps) {
+export function RecommendationsView({ username, recommendationsLimit }: RecommendationsViewProps) {
   const [recommendations, setRecommendations] = useState<RecommendationDto[]>([]);
   const [recommendationsUsed, setRecommendationsUsed] = useState<number>(0);
 
   const handleRecommendationsGenerated = (newRecommendations: RecommendationDto[]) => {
     setRecommendations(newRecommendations);
-    setRecommendationsUsed(prev => prev + 1);
+    setRecommendationsUsed((prev) => prev + 1);
   };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Witaj ponownie, {username}!
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Witaj ponownie, {username}!</h1>
         <p className="text-muted-foreground">
           Wygeneruj spersonalizowane rekomendacje filmowe na podstawie Twoich ocen
         </p>

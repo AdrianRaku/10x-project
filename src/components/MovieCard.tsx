@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { MovieRating } from "./MovieRating";
 import { ListPlus, Info } from "lucide-react";
 
-type MovieCardProps = {
+interface MovieCardProps {
   tmdb_id: number;
   title: string;
   posterPath?: string | null;
   releaseDate?: string;
   year?: number;
-};
+}
 
 export function MovieCard({ tmdb_id, title, posterPath, releaseDate, year }: MovieCardProps) {
   const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -18,9 +18,7 @@ export function MovieCard({ tmdb_id, title, posterPath, releaseDate, year }: Mov
   const displayYear = year || (releaseDate ? new Date(releaseDate).getFullYear() : null);
 
   // Construct poster URL or use placeholder
-  const posterUrl = posterPath
-    ? `${TMDB_IMAGE_BASE_URL}${posterPath}`
-    : null;
+  const posterUrl = posterPath ? `${TMDB_IMAGE_BASE_URL}${posterPath}` : null;
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg flex flex-col">
@@ -41,14 +39,8 @@ export function MovieCard({ tmdb_id, title, posterPath, releaseDate, year }: Mov
         </div>
 
         <CardHeader className="p-3">
-          <CardTitle className="line-clamp-2 text-sm leading-tight">
-            {title}
-          </CardTitle>
-          {displayYear && (
-            <CardDescription className="text-xs">
-              {displayYear}
-            </CardDescription>
-          )}
+          <CardTitle className="line-clamp-2 text-sm leading-tight">{title}</CardTitle>
+          {displayYear && <CardDescription className="text-xs">{displayYear}</CardDescription>}
         </CardHeader>
       </a>
 

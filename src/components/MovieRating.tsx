@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { Star } from "lucide-react";
 
-type MovieRatingProps = {
+interface MovieRatingProps {
   tmdbId: number;
   movieTitle: string;
-};
+}
 
 export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
   const [open, setOpen] = useState(false);
@@ -103,9 +103,7 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Oceń film</DialogTitle>
-          <DialogDescription>
-            Jak oceniasz "{movieTitle}"? Wybierz ocenę od 1 do 10.
-          </DialogDescription>
+          <DialogDescription>Jak oceniasz "{movieTitle}"? Wybierz ocenę od 1 do 10.</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <div className="flex justify-center gap-1">
@@ -140,11 +138,7 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
               Wybrana ocena: <span className="font-semibold text-foreground">{selectedRating}/10</span>
             </p>
           )}
-          {error && (
-            <p className="mt-4 text-center text-sm text-destructive">
-              {error}
-            </p>
-          )}
+          {error && <p className="mt-4 text-center text-sm text-destructive">{error}</p>}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleCancel} disabled={isLoading}>

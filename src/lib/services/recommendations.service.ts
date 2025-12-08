@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import type { SupabaseClient } from '../../db/supabase.client';
-import type { RecommendationDto } from '../../types';
-import { OpenRouterService } from './openrouter.service';
+import { z } from "zod";
+import type { SupabaseClient } from "../../db/supabase.client";
+import type { RecommendationDto } from "../../types";
+import { OpenRouterService } from "./openrouter.service";
 
 // ============================================================================
 // Custom Error Classes
@@ -11,9 +11,12 @@ import { OpenRouterService } from './openrouter.service';
  * Error thrown when user has insufficient ratings to generate recommendations.
  */
 export class InsufficientRatingsError extends Error {
-  constructor(public currentCount: number, public requiredCount: number = 10) {
+  constructor(
+    public currentCount: number,
+    public requiredCount = 10
+  ) {
     super(`User has only ${currentCount} ratings, minimum ${requiredCount} required`);
-    this.name = 'InsufficientRatingsError';
+    this.name = "InsufficientRatingsError";
   }
 }
 
@@ -27,7 +30,7 @@ export class DailyLimitExceededError extends Error {
     public resetTime: Date
   ) {
     super(`Daily limit of ${dailyLimit} requests exceeded`);
-    this.name = 'DailyLimitExceededError';
+    this.name = "DailyLimitExceededError";
   }
 }
 
@@ -37,7 +40,7 @@ export class DailyLimitExceededError extends Error {
 export class AIResponseParsingError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'AIResponseParsingError';
+    this.name = "AIResponseParsingError";
   }
 }
 
@@ -68,10 +71,10 @@ const RecommendationsResponseSchema = z.object({
 /**
  * Represents a user's rating for a movie.
  */
-type UserRating = {
+interface UserRating {
   tmdb_id: number;
   rating: number;
-};
+}
 
 // ============================================================================
 // RecommendationsService
@@ -140,15 +143,12 @@ export class RecommendationsService {
   /**
    * Retrieves user's rating history from the database.
    */
-  private async getUserRatings(
-    userId: string,
-    supabase: SupabaseClient
-  ): Promise<UserRating[]> {
+  private async getUserRatings(userId: string, supabase: SupabaseClient): Promise<UserRating[]> {
     const { data, error } = await supabase
-      .from('ratings')
-      .select('tmdb_id, rating')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("ratings")
+      .select("tmdb_id, rating")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw error;
@@ -160,18 +160,15 @@ export class RecommendationsService {
   /**
    * Counts how many recommendation requests the user made today.
    */
-  private async getRequestsCountToday(
-    userId: string,
-    supabase: SupabaseClient
-  ): Promise<number> {
+  private async getRequestsCountToday(userId: string, supabase: SupabaseClient): Promise<number> {
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
 
     const { count, error } = await supabase
-      .from('ai_recommendation_requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .gte('created_at', todayStart.toISOString());
+      .from("ai_recommendation_requests")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", todayStart.toISOString());
 
     if (error) {
       throw error;
@@ -195,39 +192,39 @@ export class RecommendationsService {
 
     // Define JSON schema for structured response
     const responseSchema = {
-      type: 'object',
+      type: "object",
       properties: {
         recommendations: {
-          type: 'array',
+          type: "array",
           items: {
-            type: 'object',
+            type: "object",
             properties: {
-              tmdb_id: { type: 'number', description: 'TMDb movie ID' },
-              title: { type: 'string', description: 'Movie title' },
-              year: { type: 'number', description: 'Release year' },
+              tmdb_id: { type: "number", description: "TMDb movie ID" },
+              title: { type: "string", description: "Movie title" },
+              year: { type: "number", description: "Release year" },
             },
-            required: ['tmdb_id', 'title', 'year'],
+            required: ["tmdb_id", "title", "year"],
             additionalProperties: false,
           },
           minItems: 5,
           maxItems: 5,
         },
       },
-      required: ['recommendations'],
+      required: ["recommendations"],
       additionalProperties: false,
     };
 
     // Call OpenRouter API
     const aiResponse = await openRouterService.generateChatCompletion({
-      model: 'openai/gpt-4o-mini',
+      model: "openai/gpt-4o-mini",
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt || 'Suggest 5 great movies for me.' },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt || "Suggest 5 great movies for me." },
       ],
       response_format: {
-        type: 'json_schema',
+        type: "json_schema",
         json_schema: {
-          name: 'movie_recommendations',
+          name: "movie_recommendations",
           strict: true,
           schema: responseSchema,
         },
@@ -239,39 +236,37 @@ export class RecommendationsService {
     // Parse and validate AI response
     const content = aiResponse.choices[0]?.message?.content;
     if (!content) {
-      throw new AIResponseParsingError('Empty response from AI');
+      throw new AIResponseParsingError("Empty response from AI");
     }
 
     let parsedContent;
     try {
       parsedContent = JSON.parse(content);
     } catch {
-      throw new AIResponseParsingError('Invalid JSON in AI response');
+      throw new AIResponseParsingError("Invalid JSON in AI response");
     }
 
     const validation = RecommendationsResponseSchema.safeParse(parsedContent);
     if (!validation.success) {
-      throw new AIResponseParsingError(
-        `AI response validation failed: ${validation.error.message}`
-      );
+      throw new AIResponseParsingError(`AI response validation failed: ${validation.error.message}`);
     }
 
     // Return recommendations with posterPath set to null (will be enriched by the endpoint)
-    return validation.data.recommendations.map((rec): RecommendationDto => ({
-      tmdb_id: rec.tmdb_id,
-      title: rec.title,
-      year: rec.year,
-      posterPath: null,
-    }));
+    return validation.data.recommendations.map(
+      (rec): RecommendationDto => ({
+        tmdb_id: rec.tmdb_id,
+        title: rec.title,
+        year: rec.year,
+        posterPath: null,
+      })
+    );
   }
 
   /**
    * Builds the system prompt with user's rating history.
    */
   private buildSystemPrompt(ratings: UserRating[]): string {
-    const ratingsText = ratings
-      .map((r) => `- TMDb ID ${r.tmdb_id}: Rating ${r.rating}/10`)
-      .join('\n');
+    const ratingsText = ratings.map((r) => `- TMDb ID ${r.tmdb_id}: Rating ${r.rating}/10`).join("\n");
 
     return `You are an expert movie recommendation system. Based on the user's rating history below, suggest 5 movies they would love.
 
@@ -289,17 +284,12 @@ Provide 5 diverse movie recommendations with valid TMDb IDs, titles, and release
   /**
    * Logs the recommendation request to the database.
    */
-  private async logRecommendationRequest(
-    userId: string,
-    supabase: SupabaseClient
-  ): Promise<void> {
-    const { error } = await supabase
-      .from('ai_recommendation_requests')
-      .insert({ user_id: userId });
+  private async logRecommendationRequest(userId: string, supabase: SupabaseClient): Promise<void> {
+    const { error } = await supabase.from("ai_recommendation_requests").insert({ user_id: userId });
 
     if (error) {
       // Log error but don't throw - we don't want to fail the response if logging fails
-      console.error('[recommendations] Failed to log request:', error);
+      console.error("[recommendations] Failed to log request:", error);
     }
   }
 
@@ -308,6 +298,6 @@ Provide 5 diverse movie recommendations with valid TMDb IDs, titles, and release
    */
   private sanitizePrompt(prompt?: string): string | undefined {
     if (!prompt) return undefined;
-    return prompt.replace(/[<>]/g, '').trim();
+    return prompt.replace(/[<>]/g, "").trim();
   }
 }

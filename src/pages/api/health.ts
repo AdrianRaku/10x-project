@@ -16,20 +16,17 @@ export const GET: APIRoute = async ({ locals }) => {
         JSON.stringify({
           status: "error",
           message: "Supabase client not available in locals",
-          middleware: "not working"
+          middleware: "not working",
         }),
         {
           status: 500,
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // Test database connection by querying ratings table
-    const { data, error } = await locals.supabase
-      .from("ratings")
-      .select("count")
-      .limit(1);
+    const { data, error } = await locals.supabase.from("ratings").select("count").limit(1);
 
     if (error) {
       return new Response(
@@ -38,11 +35,11 @@ export const GET: APIRoute = async ({ locals }) => {
           message: "Database connection failed",
           error: error.message,
           middleware: "working",
-          database: "not reachable"
+          database: "not reachable",
         }),
         {
           status: 500,
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -54,11 +51,11 @@ export const GET: APIRoute = async ({ locals }) => {
         middleware: "working",
         database: "connected",
         supabase_client_type: typeof locals.supabase,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       }
     );
   } catch (error) {
@@ -66,11 +63,11 @@ export const GET: APIRoute = async ({ locals }) => {
       JSON.stringify({
         status: "error",
         message: "Unexpected error",
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       }
     );
   }

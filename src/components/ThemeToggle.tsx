@@ -44,11 +44,7 @@ export function ThemeToggle() {
       aria-label={theme === "light" ? "Przełącz na tryb ciemny" : "Przełącz na tryb jasny"}
       className="fixed right-4 top-4 z-50"
     >
-      {theme === "light" ? (
-        <Moon className="size-5" />
-      ) : (
-        <Sun className="size-5" />
-      )}
+      {theme === "light" ? <Moon className="size-5" /> : <Sun className="size-5" />}
     </Button>
   );
 }

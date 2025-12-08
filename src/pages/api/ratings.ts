@@ -17,7 +17,6 @@
  * - 200 OK: Existing rating was updated
  * - 400 Bad Request: Invalid input data or malformed JSON
  * - 401 Unauthorized: User is not authenticated
- *   TODO: Currently using DEFAULT_USER_ID for development. Implement proper JWT authentication via middleware.
  * - 422 Unprocessable Entity: Database constraint violation
  * - 500 Internal Server Error: Unexpected server error
  *
@@ -58,11 +57,7 @@
  * }
  *
  * @security
- * - Requires authentication
- *   TODO: Currently using DEFAULT_USER_ID for development. Replace with:
- *         const session = await locals.supabase.auth.getSession();
- *         if (!session.data.session) { return 401 Unauthorized }
- *         const userId = session.data.session.user.id;
+ * - Requires authentication via middleware (Astro.locals.user)
  * - RLS policies ensure users can only modify their own ratings
  * - Input validation via Zod schema
  * - Database constraints enforce rating range (1-10)
@@ -134,23 +129,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
   }
 
-  // Get default user ID from environment (temporary development solution)
-  // TODO: Replace with proper session-based authentication:
-  //       const session = await locals.supabase.auth.getSession();
-  //       if (!session.data.session) {
-  //         return new Response(JSON.stringify({ error: "Unauthorized", message: "User not authenticated" }), { status: 401 });
-  //       }
-  //       const userId = session.data.session.user.id;
-  const defaultUserId = import.meta.env.DEFAULT_USER_ID;
+  // Get authenticated user from middleware
+  const user = locals.user;
 
-  if (!defaultUserId) {
+  if (!user) {
     return new Response(
       JSON.stringify({
-        error: "Internal Server Error",
-        message: "DEFAULT_USER_ID environment variable is not set",
+        error: "Unauthorized",
+        message: "User not authenticated",
       }),
       {
-        status: 500,
+        status: 401,
         headers: {
           "Content-Type": "application/json",
         },
@@ -161,7 +150,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   // Execute upsert operation
   try {
     const ratingsService = new RatingsService();
-    const result = await ratingsService.upsertRating(validationResult.data, defaultUserId, locals.supabase);
+    const result = await ratingsService.upsertRating(validationResult.data, user.id, locals.supabase);
 
     // Return appropriate status code based on operation type
     const statusCode = result.wasCreated ? 201 : 200;
@@ -226,17 +215,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
  */
 export const GET: APIRoute = async ({ locals }) => {
   try {
-    // Get default user ID from environment (temporary development solution)
-    const defaultUserId = import.meta.env.DEFAULT_USER_ID;
+    // Get authenticated user from middleware
+    const user = locals.user;
 
-    if (!defaultUserId) {
+    if (!user) {
       return new Response(
         JSON.stringify({
-          error: "Internal Server Error",
-          message: "DEFAULT_USER_ID environment variable is not set",
+          error: "Unauthorized",
+          message: "User not authenticated",
         }),
         {
-          status: 500,
+          status: 401,
           headers: {
             "Content-Type": "application/json",
           },
@@ -248,7 +237,7 @@ export const GET: APIRoute = async ({ locals }) => {
     const { data, error } = await locals.supabase
       .from("ratings")
       .select("tmdb_id, rating, created_at, updated_at")
-      .eq("user_id", defaultUserId)
+      .eq("user_id", user.id)
       .order("updated_at", { ascending: false });
 
     if (error) {

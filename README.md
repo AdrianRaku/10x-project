@@ -40,6 +40,9 @@ The project is built with a modern and robust technology stack:
     -   [Supabase](https://supabase.com/)
 -   **AI Integration:**
     -   [OpenRouter.ai](https://openrouter.ai/)
+-   **Testing:**
+    -   [Vitest](https://vitest.dev/) - Unit & Integration Testing
+    -   [Playwright](https://playwright.dev/) - E2E Testing
 -   **CI/CD & Hosting:**
     -   [GitHub Actions](https://github.com/features/actions)
     -   [DigitalOcean](https://www.digitalocean.com/)

@@ -1,15 +1,18 @@
-<tech-stack> 
+<tech-stack>
 Frontend:
-    - Astro 5 
-    - React 19 
-    - TypeScript 5 
-    - Tailwind4 
-     -Shadcn/ui
+    - Astro 5
+    - React 19
+    - TypeScript 5
+    - Tailwind4
+    - Shadcn/ui
 Backend i Database:
-    -Supabase
-Kumunikacja z Modelami Ai
+    - Supabase
+Komunikacja z Modelami AI:
     - Openrouter.ai
-Ci/CD i Hosting
-    -Github Actions
-    -DigitalOcean
+Testing:
+    - Vitest (Unit & Integration Tests)
+    - Playwright (E2E Tests)
+CI/CD i Hosting:
+    - Github Actions
+    - DigitalOcean
 </tech-stack>

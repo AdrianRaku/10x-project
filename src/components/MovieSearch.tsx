@@ -51,7 +51,7 @@ export function MovieSearch() {
   }, [debouncedQuery]);
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6" data-test-id="movie-search">
       <div className="relative mx-auto max-w-md">
         <input
           type="search"
@@ -61,28 +61,29 @@ export function MovieSearch() {
           maxLength={50}
           className="w-full rounded-md border border-input bg-background px-4 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
           aria-label="Wyszukaj film"
+          data-test-id="movie-search-input"
         />
         {query.trim().length > 0 && query.trim().length < 5 && (
           <p className="mt-1 text-xs text-muted-foreground">Wpisz co najmniej 5 znaków, aby wyszukać</p>
         )}
       </div>
 
-      {isLoading && <div className="text-center text-sm text-muted-foreground">Wyszukiwanie...</div>}
+      {isLoading && <div className="text-center text-sm text-muted-foreground" data-test-id="movie-search-loading">Wyszukiwanie...</div>}
 
       {error && (
-        <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive" data-test-id="movie-search-error">
           {error}
         </div>
       )}
 
       {!isLoading && !error && results.length === 0 && debouncedQuery.trim().length >= 5 && (
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground" data-test-id="movie-search-no-results">
           Nie znaleziono filmów pasujących do Twojego zapytania
         </div>
       )}
 
       {!isLoading && !error && results.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" data-test-id="movie-search-results">
           {results.map((movie) => (
             <MovieCard
               key={movie.tmdb_id}

@@ -8,7 +8,7 @@
 -- ============================================================================
 
 -- Enable moddatetime extension for automatic updated_at handling
-create extension if not exists moddatetime with schema extensions;
+create extension if not exists moddatetime;
 
 -- ============================================================================
 -- CUSTOM TYPES

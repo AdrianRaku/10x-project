@@ -95,18 +95,18 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="flex items-center gap-2">
+        <Button variant="default" className="flex items-center gap-2" data-test-id="rate-movie-button">
           <Star className="size-4" />
           {currentRating ? `Twoja ocena: ${currentRating}/10` : "Oceń film"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" data-test-id="rating-dialog">
         <DialogHeader>
           <DialogTitle>Oceń film</DialogTitle>
           <DialogDescription>Jak oceniasz "{movieTitle}"? Wybierz ocenę od 1 do 10.</DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <div className="flex justify-center gap-1">
+          <div className="flex justify-center gap-1" data-test-id="rating-stars-container">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((rating) => {
               const isSelected = selectedRating !== null && rating <= selectedRating;
               const isHovered = hoveredRating !== null && rating <= hoveredRating;
@@ -121,6 +121,7 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
                   onMouseLeave={() => setHoveredRating(null)}
                   className="group p-0.5 transition-transform hover:scale-110"
                   aria-label={`Ocena ${rating}`}
+                  data-test-id={`rating-star-${rating}`}
                 >
                   <Star
                     className={`size-6 transition-all ${
@@ -134,17 +135,17 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
             })}
           </div>
           {selectedRating !== null && (
-            <p className="mt-4 text-center text-sm text-muted-foreground">
+            <p className="mt-4 text-center text-sm text-muted-foreground" data-test-id="selected-rating-display">
               Wybrana ocena: <span className="font-semibold text-foreground">{selectedRating}/10</span>
             </p>
           )}
-          {error && <p className="mt-4 text-center text-sm text-destructive">{error}</p>}
+          {error && <p className="mt-4 text-center text-sm text-destructive" data-test-id="rating-error">{error}</p>}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
+          <Button variant="outline" onClick={handleCancel} disabled={isLoading} data-test-id="rating-cancel-button">
             Anuluj
           </Button>
-          <Button onClick={handleSubmit} disabled={isLoading || selectedRating === null}>
+          <Button onClick={handleSubmit} disabled={isLoading || selectedRating === null} data-test-id="rating-submit-button">
             {isLoading ? "Zapisywanie..." : "Zapisz ocenę"}
           </Button>
         </DialogFooter>

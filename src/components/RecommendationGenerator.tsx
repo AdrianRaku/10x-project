@@ -61,8 +61,8 @@ export function RecommendationGenerator({
   };
 
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4" data-test-id="recommendation-generator">
+      <form onSubmit={handleSubmit} className="space-y-4" data-test-id="recommendation-form">
         <div className="space-y-2">
           <label htmlFor="prompt" className="text-sm font-medium">
             Opcjonalny prompt (np. "Polecam mi filmy science fiction z lat 80-tych")
@@ -74,27 +74,28 @@ export function RecommendationGenerator({
             onChange={(e) => setPrompt(e.target.value)}
             disabled={isLoading || isLimitReached}
             rows={3}
+            data-test-id="recommendation-prompt-input"
           />
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground" data-test-id="recommendations-usage-counter">
             Wykorzystano: {recommendationsUsed} / {recommendationsLimit}
           </span>
-          <Button type="submit" disabled={isLoading || isLimitReached}>
+          <Button type="submit" disabled={isLoading || isLimitReached} data-test-id="generate-recommendations-button">
             {isLoading ? "Generowanie..." : "Zaproponuj coś dla mnie"}
           </Button>
         </div>
       </form>
 
       {error && (
-        <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive" data-test-id="recommendation-error">
           {error}
         </div>
       )}
 
       {isLoading && (
-        <div className="space-y-4">
+        <div className="space-y-4" data-test-id="recommendation-loading">
           <div className="text-sm font-medium">Generowanie rekomendacji...</div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 5 }).map((_, i) => (

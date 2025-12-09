@@ -14,11 +14,11 @@ test.describe('Login Page', () => {
     await expect(page.getByRole('heading', { name: /witaj ponownie/i })).toBeVisible();
 
     // Check for form inputs
-    await expect(page.getByLabel(/email/i)).toBeVisible();
-    await expect(page.getByLabel(/hasło/i)).toBeVisible();
+    await expect(page.getByTestId('login-email-input')).toBeVisible();
+    await expect(page.getByTestId('login-password-input')).toBeVisible();
 
     // Check for submit button
-    await expect(page.getByRole('button', { name: /zaloguj/i })).toBeVisible();
+    await expect(page.getByTestId('login-submit-button')).toBeVisible();
   });
 
   test('displays link to registration', async ({ page }) => {
@@ -29,12 +29,11 @@ test.describe('Login Page', () => {
 
   test('displays error on empty form submission', async ({ page }) => {
     // Click submit button without filling the form
-    await page.getByRole('button', { name: /zaloguj/i }).click();
+    await page.getByTestId('login-submit-button').click();
 
-    // Browser validation should prevent submission
-    // or form should show validation errors
-    const emailInput = page.getByLabel(/email/i);
-    await expect(emailInput).toBeFocused();
+    // Form should show validation errors
+    await expect(page.getByTestId('login-email-error')).toBeVisible();
+    await expect(page.getByTestId('login-email-error')).toHaveText('Adres e-mail jest wymagany');
   });
 
   test('navigates to register page when clicking register link', async ({ page }) => {

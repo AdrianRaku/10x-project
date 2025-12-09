@@ -69,7 +69,7 @@ export function LoginForm() {
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" data-test-id="login-form">
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
@@ -82,8 +82,9 @@ export function LoginForm() {
             disabled={isLoading}
             aria-invalid={!!errors.email}
             className={errors.email ? "border-destructive" : ""}
+            data-test-id="login-email-input"
           />
-          {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+          {errors.email && <p className="text-sm text-destructive" data-test-id="login-email-error">{errors.email}</p>}
         </div>
 
         <div className="space-y-2">
@@ -97,18 +98,19 @@ export function LoginForm() {
             disabled={isLoading}
             aria-invalid={!!errors.password}
             className={errors.password ? "border-destructive" : ""}
+            data-test-id="login-password-input"
           />
-          {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+          {errors.password && <p className="text-sm text-destructive" data-test-id="login-password-error">{errors.password}</p>}
         </div>
       </div>
 
       {errors.form && (
-        <div className="rounded-lg border border-destructive bg-destructive/10 p-3">
+        <div className="rounded-lg border border-destructive bg-destructive/10 p-3" data-test-id="login-form-error">
           <p className="text-sm text-destructive">{errors.form}</p>
         </div>
       )}
 
-      <Button type="submit" disabled={isLoading} className="w-full">
+      <Button type="submit" disabled={isLoading} className="w-full" data-test-id="login-submit-button">
         {isLoading ? (
           <>
             <Loader2 className="animate-spin" />

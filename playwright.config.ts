@@ -28,7 +28,7 @@ export default defineConfig({
   webServer: {
     command: './scripts/dev-server.sh',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false, // Always restart to get fresh data after cleanup
     timeout: 120 * 1000, // 2 minutes
   },
 });

@@ -48,5 +48,14 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
     return redirect("/login");
   }
 
-  return next();
+  const response = await next();
+
+  // Disable caching in test environment to ensure fresh data after cleanup
+  if (import.meta.env.MODE === 'test' || import.meta.env.DEV) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+  }
+
+  return response;
 });

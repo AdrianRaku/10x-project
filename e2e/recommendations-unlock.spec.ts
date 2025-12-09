@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/test-setup';
 import { LoginPage } from './pages/login.page';
 import { MainPage } from './pages/main.page';
 import { getTestCredentials } from './helpers/test-credentials';
@@ -13,37 +13,41 @@ test.describe('Recommendations Unlock Scenario', () => {
     mainPage = new MainPage(page);
   });
 
-  test('user without 10 ratings cannot generate recommendations', async ({ page }) => {
-    // Step 1: Navigate to login page
+  test('user without 10 ratings cannot generate recommendations', async ({ page, context }) => {
+    // Step 1: Clear all cookies and storage to ensure fresh start after cleanup
+    await context.clearCookies();
+    await context.clearPermissions();
+
+    // Step 2: Navigate to login page
     await loginPage.goto();
 
-    // Step 2: Fill in login credentials and submit
+    // Step 3: Fill in login credentials and submit
     await loginPage.login(credentials.username, credentials.password);
 
     // Wait for navigation away from login page (redirect after successful login)
     await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
 
-    // Step 3: Verify user is on main page
+    // Step 4: Verify user is on main page
     await expect(mainPage.heading).toBeVisible();
 
-    // Step 4: Verify recommendations are locked
+    // Step 5: Verify recommendations are locked
     const isLocked = await mainPage.isRecommendationsLocked();
     expect(isLocked).toBe(true);
 
-    // Step 5: Verify locked message is displayed
+    // Step 6: Verify locked message is displayed
     await expect(mainPage.recommendationsLockedMessage).toBeVisible();
 
-    // Step 6: Verify threshold is 10
+    // Step 7: Verify threshold is 10
     const threshold = await mainPage.getRatingsThreshold();
     expect(threshold).toBe(10);
 
-    // Step 7: Verify recommendations section is not visible
+    // Step 8: Verify recommendations section is not visible
     await expect(mainPage.recommendationsSection).not.toBeVisible();
 
-    // Step 8: Verify progress bar shows current progress
+    // Step 9: Verify progress bar shows current progress (should be 0 after cleanup)
     const progress = await mainPage.getRatingsProgress();
     expect(progress.total).toBe(10);
-    expect(progress.current).toBeLessThan(10);
+    expect(progress.current).toBe(0);
   });
 
   test('user can rate movies and unlock recommendations after 10 ratings', async ({ page }) => {

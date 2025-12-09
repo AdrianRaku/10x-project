@@ -41,12 +41,23 @@ const user = Astro.locals.user;
       class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
     >
       <div class="container flex h-14 items-center justify-between px-4">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-6">
           <a href="/" class="flex items-center gap-2 font-semibold">
             <span class="text-xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               MyFilms
             </span>
           </a>
+
+          {user && (
+            <nav class="hidden sm:flex items-center gap-4">
+              <a
+                href="/my-lists"
+                class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                Moje listy
+              </a>
+            </nav>
+          )}
         </div>
 
         <div class="flex items-center gap-2">

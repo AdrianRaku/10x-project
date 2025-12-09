@@ -1,7 +1,8 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MovieRating } from "./MovieRating";
-import { ListPlus, Info } from "lucide-react";
+import { MovieListActions } from "./MovieListActions";
+import { Info } from "lucide-react";
 
 interface MovieCardProps {
   tmdb_id: number;
@@ -53,10 +54,7 @@ export function MovieCard({ tmdb_id, title, posterPath, releaseDate, year }: Mov
               Szczegóły
             </a>
           </Button>
-          <Button variant="outline" size="sm" className="flex-1">
-            <ListPlus className="size-4 mr-1" />
-            Lista
-          </Button>
+          <MovieListActions tmdbId={tmdb_id} movieTitle={title} />
         </div>
       </CardFooter>
     </Card>

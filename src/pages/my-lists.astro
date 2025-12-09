@@ -1,0 +1,61 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { MyListsTabs } from "../components/MyListsTabs";
+
+export const prerender = false;
+
+// Get authenticated user from middleware
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+// Fetch user's ratings
+const { data: ratings, error: ratingsError } = await Astro.locals.supabase
+  .from("ratings")
+  .select("tmdb_id, rating, created_at, updated_at")
+  .eq("user_id", user.id)
+  .order("updated_at", { ascending: false });
+
+if (ratingsError) {
+  throw new Error(`Failed to fetch user ratings: ${ratingsError.message}`);
+}
+
+// Fetch user's lists
+const { data: lists, error: listsError } = await Astro.locals.supabase
+  .from("user_lists")
+  .select("tmdb_id, list_type, created_at")
+  .eq("user_id", user.id)
+  .order("created_at", { ascending: false });
+
+if (listsError) {
+  throw new Error(`Failed to fetch user lists: ${listsError.message}`);
+}
+
+// Group lists by type
+const watchlist = lists?.filter((item) => item.list_type === "watchlist") || [];
+const favorites = lists?.filter((item) => item.list_type === "favorite") || [];
+---
+
+<Layout title="Moje listy - MyFilms">
+  <main class="container mx-auto px-4 py-8">
+    <div class="space-y-6">
+      <!-- Page header -->
+      <div class="space-y-2">
+        <h1 class="text-3xl font-bold tracking-tight">Moje listy</h1>
+        <p class="text-muted-foreground">
+          Przeglądaj swoje ocenione filmy, listę "Do obejrzenia" i ulubione tytuły
+        </p>
+      </div>
+
+      <!-- Tabs with movie lists -->
+      <MyListsTabs
+        client:load
+        initialRatings={ratings || []}
+        initialWatchlist={watchlist}
+        initialFavorites={favorites}
+      />
+    </div>
+  </main>
+</Layout>

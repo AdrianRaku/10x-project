@@ -1,78 +1,12 @@
-/**
- * @fileoverview API Endpoint for Movie Ratings
- *
- * @endpoint POST /api/ratings - Create or update a rating
- * @endpoint GET /api/ratings - Get all ratings for the authenticated user
- * @description Creates a new movie rating or updates an existing one for the authenticated user.
- *              Uses upsert logic to simplify client-side operations.
- *
- * @requestBody
- * {
- *   "tmdb_id": number,  // The Movie Database ID (positive integer)
- *   "rating": number    // User rating (integer between 1-10)
- * }
- *
- * @responses
- * - 201 Created: New rating was created
- * - 200 OK: Existing rating was updated
- * - 400 Bad Request: Invalid input data or malformed JSON
- * - 401 Unauthorized: User is not authenticated
- * - 422 Unprocessable Entity: Database constraint violation
- * - 500 Internal Server Error: Unexpected server error
- *
- * @example Success (Created)
- * POST /api/ratings
- * Body: { "tmdb_id": 808, "rating": 8 }
- * Response: 201 Created
- * {
- *   "data": {
- *     "tmdb_id": 808,
- *     "rating": 8,
- *     "created_at": "2025-11-28T10:09:41.549719+00:00",
- *     "updated_at": "2025-11-28T10:09:41.549719+00:00"
- *   }
- * }
- *
- * @example Success (Updated)
- * POST /api/ratings
- * Body: { "tmdb_id": 808, "rating": 9 }
- * Response: 200 OK
- * {
- *   "data": {
- *     "tmdb_id": 808,
- *     "rating": 9,
- *     "created_at": "2025-11-28T10:09:41.549719+00:00",
- *     "updated_at": "2025-11-28T10:09:50.883092+00:00"
- *   }
- * }
- *
- * @example Error (Validation)
- * POST /api/ratings
- * Body: { "tmdb_id": -1, "rating": 8 }
- * Response: 400 Bad Request
- * {
- *   "error": "Bad Request",
- *   "message": "Invalid request data",
- *   "details": [...]
- * }
- *
- * @security
- * - Requires authentication via middleware (Astro.locals.user)
- * - RLS policies ensure users can only modify their own ratings
- * - Input validation via Zod schema
- * - Database constraints enforce rating range (1-10)
- */
-
 import type { APIRoute } from "astro";
 import { z } from "zod";
-
+import { validateRequest, requireAuth } from "../../lib/middleware/validation.middleware";
 import { RatingsService } from "../../lib/services/ratings.service";
 
 export const prerender = false;
 
 /**
  * Zod schema for validating the request body.
- * Ensures tmdb_id is a positive integer and rating is between 1-10.
  */
 const addOrUpdateRatingSchema = z.object({
   tmdb_id: z.number().int().positive({
@@ -84,75 +18,30 @@ const addOrUpdateRatingSchema = z.object({
 });
 
 /**
- * POST handler for creating or updating a movie rating.
- *
- * @param request - Astro API request object
- * @param locals - Astro locals containing Supabase client
- * @returns JSON response with rating data or error message
+ * POST /api/ratings - Refactored with middleware pattern
  */
-export const POST: APIRoute = async ({ request, locals }) => {
-  // Parse and validate request body
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return new Response(
-      JSON.stringify({
-        error: "Bad Request",
-        message: "Invalid JSON in request body",
-      }),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+export const POST: APIRoute = async (context) => {
+  // 1. Validate authentication
+  const authResult = requireAuth(context);
+  if (!authResult.success) {
+    return authResult.response;
   }
 
-  // Validate request body against schema
-  const validationResult = addOrUpdateRatingSchema.safeParse(body);
-
+  // 2. Validate request body
+  const validationResult = await validateRequest(addOrUpdateRatingSchema)(context);
   if (!validationResult.success) {
-    return new Response(
-      JSON.stringify({
-        error: "Bad Request",
-        message: "Invalid request data",
-        details: validationResult.error.errors,
-      }),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return validationResult.response;
   }
 
-  // Get authenticated user from middleware
-  const user = locals.user;
-
-  if (!user) {
-    return new Response(
-      JSON.stringify({
-        error: "Unauthorized",
-        message: "User not authenticated",
-      }),
-      {
-        status: 401,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  }
-
-  // Execute upsert operation
+  // 3. Execute business logic
   try {
     const ratingsService = new RatingsService();
-    const result = await ratingsService.upsertRating(validationResult.data, user.id, locals.supabase);
+    const result = await ratingsService.upsertRating(
+      validationResult.data,
+      authResult.userId,
+      context.locals.supabase
+    );
 
-    // Return appropriate status code based on operation type
     const statusCode = result.wasCreated ? 201 : 200;
 
     return new Response(
@@ -171,7 +60,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (error && typeof error === "object" && "code" in error) {
       const pgError = error as { code: string; message: string };
 
-      // PostgreSQL check constraint violation
       if (pgError.code === "23514") {
         return new Response(
           JSON.stringify({
@@ -188,10 +76,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     }
 
-    // Log unexpected errors (full details for debugging)
     console.error("Error upserting rating:", error);
 
-    // Return generic server error (without exposing internal details)
     return new Response(
       JSON.stringify({
         error: "Internal Server Error",
@@ -208,36 +94,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
 };
 
 /**
- * GET handler for retrieving all ratings for the authenticated user.
- *
- * @param locals - Astro locals containing Supabase client
- * @returns JSON response with array of ratings
+ * GET /api/ratings - Refactored with middleware pattern
  */
-export const GET: APIRoute = async ({ locals }) => {
+export const GET: APIRoute = async (context) => {
+  // 1. Validate authentication
+  const authResult = requireAuth(context);
+  if (!authResult.success) {
+    return authResult.response;
+  }
+
+  // 2. Fetch ratings
   try {
-    // Get authenticated user from middleware
-    const user = locals.user;
-
-    if (!user) {
-      return new Response(
-        JSON.stringify({
-          error: "Unauthorized",
-          message: "User not authenticated",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
-    // Fetch all ratings for the user
-    const { data, error } = await locals.supabase
+    const { data, error } = await context.locals.supabase
       .from("ratings")
       .select("tmdb_id, rating, created_at, updated_at")
-      .eq("user_id", user.id)
+      .eq("user_id", authResult.userId)
       .order("updated_at", { ascending: false });
 
     if (error) {
@@ -284,3 +155,4 @@ export const GET: APIRoute = async ({ locals }) => {
     );
   }
 };
+

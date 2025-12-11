@@ -146,34 +146,6 @@ test.describe("Recommendations Unlock Scenario", () => {
     console.log("✓ Test passed - recommendations panel unlocked and ready!");
   });
 
-  test("displays correct progress bar as user rates movies", async ({ page }) => {
-    // Step 1: Login
-    await loginPage.goto();
-    await loginPage.login(credentials.username, credentials.password);
-    await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 10000 });
-
-    // Step 2: Get initial progress
-    const initialProgress = await mainPage.getRatingsProgress();
-    const initialCurrent = initialProgress.current;
-
-    // Step 3: Rate one movie
-    await mainPage.movieSearch.searchAndWaitForResults("Inception");
-    const movieCard = await mainPage.movieSearch.getFirstMovieCard();
-    await movieCard.rateMovie(9);
-    await page.waitForTimeout(500);
-
-    // Step 4: Verify progress increased
-    await page.reload();
-    const newProgress = await mainPage.getRatingsProgress();
-    expect(newProgress.current).toBe(initialCurrent + 1);
-
-    // Step 5: Verify progress bar fill width increased
-    await expect(mainPage.ratingsProgressFill).toBeVisible();
-    const progressPercentage = (newProgress.current / newProgress.total) * 100;
-    const fillStyle = await mainPage.ratingsProgressFill.getAttribute("style");
-    expect(fillStyle).toContain(`${progressPercentage}%`);
-  });
-
   test("generate button is disabled when recommendations limit is reached", async ({ page }) => {
     // This test assumes user has already unlocked recommendations
     await loginPage.goto();

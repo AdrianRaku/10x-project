@@ -30,5 +30,12 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: false, // Always restart to get fresh data after cleanup
     timeout: 120 * 1000, // 2 minutes
+    env: {
+      ...process.env,
+      // Ensure CI env vars are available to webServer subprocess
+      SUPABASE_URL: process.env.SUPABASE_URL || "",
+      SUPABASE_KEY: process.env.SUPABASE_KEY || "",
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+    },
   },
 });

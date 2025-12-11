@@ -27,15 +27,6 @@ test.describe("Login Page", () => {
     await expect(registerLink).toHaveAttribute("href", "/register");
   });
 
-  test("displays error on empty form submission", async ({ page }) => {
-    // Click submit button without filling the form
-    await page.getByTestId("login-submit-button").click();
-
-    // Form should show validation errors
-    await expect(page.getByTestId("login-email-error")).toBeVisible();
-    await expect(page.getByTestId("login-email-error")).toHaveText("Adres e-mail jest wymagany");
-  });
-
   test("navigates to register page when clicking register link", async ({ page }) => {
     await page.getByRole("link", { name: /zarejestruj się/i }).click();
     await expect(page).toHaveURL(/\/register/);

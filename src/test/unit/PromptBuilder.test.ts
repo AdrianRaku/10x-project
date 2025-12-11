@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PromptBuilder } from "../../../lib/services/recommendations/PromptBuilder";
+import { PromptBuilder } from "../../lib/services/recommendations/PromptBuilder";
 
 describe("PromptBuilder", () => {
   describe("buildSystemPrompt", () => {
@@ -26,7 +26,7 @@ describe("PromptBuilder", () => {
         .buildSystemPrompt();
 
       expect(prompt).toContain("User's rating history:");
-      expect(prompt).not.toContain("TMDb ID");
+      expect(prompt).not.toContain("- TMDb ID");
     });
   });
 

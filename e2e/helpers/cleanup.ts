@@ -9,8 +9,19 @@ function createCleanupClient() {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  // Debug: log available env vars (for CI troubleshooting)
+  if (process.env.CI) {
+    console.log("[Cleanup Debug] SUPABASE_URL:", supabaseUrl ? "SET" : "NOT SET");
+    console.log("[Cleanup Debug] SUPABASE_SERVICE_ROLE_KEY:", supabaseServiceKey ? "SET" : "NOT SET");
+    console.log("[Cleanup Debug] All env keys:", Object.keys(process.env).filter(k => k.includes("SUPABASE")));
+  }
+
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in .env.test file");
+    throw new Error(
+      "SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set. " +
+        "Locally: add them to .env.test file. " +
+        "On CI: ensure they are passed as environment variables in workflow."
+    );
   }
 
   return createClient<Database>(supabaseUrl, supabaseServiceKey, {

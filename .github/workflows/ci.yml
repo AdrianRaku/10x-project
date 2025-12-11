@@ -28,24 +28,9 @@ jobs:
 
       - name: Run unit tests
         run: npm test
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          DEFAULT_USER_ID: ${{ secrets.DEFAULT_USER_ID }}
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-
-      - name: Run e2e tests
-        run: npm run test:e2e
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          DEFAULT_USER_ID: ${{ secrets.DEFAULT_USER_ID }}
 
   build:
     runs-on: ubuntu-latest

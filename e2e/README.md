@@ -21,6 +21,7 @@ e2e/
 ## Page Object Models (POM)
 
 The `pages/` and `components/` directories contain Page Object Models that encapsulate page-specific and component-specific logic and selectors. This pattern:
+
 - Improves test maintainability
 - Reduces code duplication
 - Makes tests more readable
@@ -30,24 +31,29 @@ The `pages/` and `components/` directories contain Page Object Models that encap
 ### Available Pages
 
 #### LoginPage (`pages/login.page.ts`)
+
 Handles login functionality and form validation.
 
 **Key Methods:**
+
 - `goto()` - Navigate to login page
 - `login(email, password)` - Fill form and submit
 - `waitForFormError()` - Wait for error message
 - `getFormErrorText()` - Get error message text
 
 **Key Locators:**
+
 - `emailInput` - Email input field
 - `passwordInput` - Password input field
 - `submitButton` - Login submit button
 - `formError` - Form error message
 
 #### MainPage (`pages/main.page.ts`)
+
 Represents the main application page with movie search and recommendations.
 
 **Key Methods:**
+
 - `goto()` - Navigate to main page
 - `isRecommendationsUnlocked()` - Check if recommendations are available
 - `isRecommendationsLocked()` - Check if recommendations are locked
@@ -57,6 +63,7 @@ Represents the main application page with movie search and recommendations.
 - `getRecommendationsCount()` - Get number of recommendations displayed
 
 **Key Locators:**
+
 - `recommendationsLockedMessage` - Message about locked recommendations
 - `ratingsThreshold` - Required number of ratings
 - `ratingsProgressBar` - Progress bar element
@@ -64,15 +71,18 @@ Represents the main application page with movie search and recommendations.
 - `recommendationsSection` - Recommendations section container
 
 **Embedded Components:**
+
 - `movieSearch` - MovieSearchComponent instance
 - `recommendationGenerator` - RecommendationGeneratorComponent instance
 
 ### Available Components
 
 #### MovieSearchComponent (`components/movie-search.component.ts`)
+
 Handles movie search functionality.
 
 **Key Methods:**
+
 - `search(query)` - Enter search query
 - `clearSearch()` - Clear search input
 - `searchAndWaitForResults(query)` - Search and wait for results
@@ -82,14 +92,17 @@ Handles movie search functionality.
 - `getAllMovieCards()` - Get all movie cards
 
 **Key Locators:**
+
 - `searchInput` - Search input field
 - `loadingIndicator` - Loading state indicator
 - `resultsContainer` - Search results container
 
 #### MovieCardComponent (`components/movie-card.component.ts`)
+
 Represents a single movie card in search results or recommendations.
 
 **Key Methods:**
+
 - `clickCard()` - Navigate to movie details
 - `getTitle()` - Get movie title
 - `getYear()` - Get movie year
@@ -98,18 +111,22 @@ Represents a single movie card in search results or recommendations.
 - `waitForVisible()` - Wait for card to be visible
 
 **Key Locators:**
+
 - `card` - Card container (dynamic: `movie-card-{tmdbId}`)
 - `link` - Card link to details
 - `title` - Movie title
 - `year` - Movie year
 
 **Embedded Components:**
+
 - `rating` - MovieRatingComponent instance
 
 #### MovieRatingComponent (`components/movie-rating.component.ts`)
+
 Handles movie rating dialog and star selection.
 
 **Key Methods:**
+
 - `openRatingDialog()` - Open rating dialog
 - `closeDialog()` - Close dialog
 - `selectRating(rating)` - Select rating (1-10)
@@ -119,6 +136,7 @@ Handles movie rating dialog and star selection.
 - `hasRating()` - Check if movie is already rated
 
 **Key Locators:**
+
 - `rateButton` - Button to open rating dialog
 - `dialog` - Rating dialog container
 - `starsContainer` - Container with star buttons
@@ -127,9 +145,11 @@ Handles movie rating dialog and star selection.
 - `cancelButton` - Cancel button
 
 #### RecommendationGeneratorComponent (`components/recommendation-generator.component.ts`)
+
 Handles AI recommendation generation.
 
 **Key Methods:**
+
 - `generateRecommendations(prompt?)` - Generate with optional prompt
 - `fillPrompt(prompt)` - Fill prompt textarea
 - `generateAndWaitForResults(prompt?)` - Generate and wait for completion
@@ -139,6 +159,7 @@ Handles AI recommendation generation.
 - `hasReachedLimit()` - Check if daily limit reached
 
 **Key Locators:**
+
 - `promptInput` - Optional prompt textarea
 - `generateButton` - Generate recommendations button
 - `usageCounter` - Usage counter display
@@ -155,11 +176,11 @@ Handles AI recommendation generation.
 ## Example Test Structure
 
 ```typescript
-import { test, expect } from '@playwright/test';
-import { LoginPage } from './pages/login.page';
-import { MainPage } from './pages/main.page';
+import { test, expect } from "@playwright/test";
+import { LoginPage } from "./pages/login.page";
+import { MainPage } from "./pages/main.page";
 
-test.describe('Feature Name', () => {
+test.describe("Feature Name", () => {
   let loginPage: LoginPage;
   let mainPage: MainPage;
 
@@ -168,14 +189,14 @@ test.describe('Feature Name', () => {
     mainPage = new MainPage(page);
   });
 
-  test('should do something', async ({ page }) => {
+  test("should do something", async ({ page }) => {
     // Login
     await loginPage.goto();
-    await loginPage.login('user@example.com', 'password');
+    await loginPage.login("user@example.com", "password");
 
     // Interact with main page
     await mainPage.goto();
-    await mainPage.movieSearch.search('Matrix');
+    await mainPage.movieSearch.search("Matrix");
     await mainPage.movieSearch.waitForResults();
 
     // Rate a movie
@@ -188,6 +209,7 @@ test.describe('Feature Name', () => {
 ## Example: Complete Scenario Test
 
 See `recommendations-unlock.spec.ts` for a complete example demonstrating:
+
 1. User login
 2. Checking recommendations lock state
 3. Rating multiple movies
@@ -197,6 +219,7 @@ See `recommendations-unlock.spec.ts` for a complete example demonstrating:
 ## Data Test IDs
 
 All components use `data-test-id` attributes for stable, resilient selectors:
+
 - Login: `login-form`, `login-email-input`, `login-password-input`, `login-submit-button`
 - Main page: `recommendations-locked-message`, `ratings-threshold`, `ratings-progress-bar`
 - Movie search: `movie-search-input`, `movie-search-results`
@@ -209,6 +232,7 @@ All components use `data-test-id` attributes for stable, resilient selectors:
 ### Environment Variables
 
 Tests use credentials from `.env.test` file:
+
 - `E2E_USERNAME` - Test user email
 - `E2E_PASSWORD` - Test user password
 
@@ -219,7 +243,7 @@ The `playwright.config.ts` automatically loads these variables using dotenv.
 `helpers/test-credentials.ts` - Helper for loading test credentials from environment variables
 
 ```typescript
-import { getTestCredentials } from './helpers/test-credentials';
+import { getTestCredentials } from "./helpers/test-credentials";
 
 const credentials = getTestCredentials();
 await loginPage.login(credentials.username, credentials.password);

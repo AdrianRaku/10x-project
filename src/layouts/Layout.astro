@@ -24,6 +24,7 @@ const user = Astro.locals.user;
     <title>{title}</title>
     <!-- Prevent flash of unstyled content (FOUC) for dark mode -->
     <script is:inline>
+      /* eslint-disable */
       (function () {
         const savedTheme = localStorage.getItem("theme");
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -33,6 +34,7 @@ const user = Astro.locals.user;
           document.documentElement.classList.add("dark");
         }
       })();
+      /* eslint-enable */
     </script>
   </head>
   <body>

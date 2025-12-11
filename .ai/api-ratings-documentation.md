@@ -1,24 +1,29 @@
 # API Documentation: Movie Ratings Endpoint
 
 ## Overview
+
 The `/api/ratings` endpoint allows authenticated users to create or update movie ratings. It implements upsert logic, automatically determining whether to create a new rating or update an existing one.
 
 ## Endpoint Details
 
 ### URL
+
 ```
 POST /api/ratings
 ```
 
 ### Authentication
+
 Currently using `DEFAULT_USER_ID` environment variable for development. Production will require JWT authentication via Supabase session.
 
 ### Request Headers
+
 ```
 Content-Type: application/json
 ```
 
 ### Request Body
+
 ```typescript
 {
   "tmdb_id": number,  // The Movie Database ID (positive integer)
@@ -27,6 +32,7 @@ Content-Type: application/json
 ```
 
 ### Response Codes
+
 - `201 Created` - New rating was successfully created
 - `200 OK` - Existing rating was successfully updated
 - `400 Bad Request` - Invalid input data or malformed JSON
@@ -41,6 +47,7 @@ Content-Type: application/json
 ### 1. Create New Rating (201 Created)
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ratings \
   -H "Content-Type: application/json" \
@@ -51,6 +58,7 @@ curl -X POST http://localhost:3000/api/ratings \
 ```
 
 **Response:**
+
 ```json
 HTTP/1.1 201 Created
 Content-Type: application/json
@@ -72,6 +80,7 @@ Content-Type: application/json
 ### 2. Update Existing Rating (200 OK)
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ratings \
   -H "Content-Type: application/json" \
@@ -82,6 +91,7 @@ curl -X POST http://localhost:3000/api/ratings \
 ```
 
 **Response:**
+
 ```json
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -106,15 +116,15 @@ Content-Type: application/json
 // Create or update a rating
 async function rateMovie(tmdbId, rating) {
   try {
-    const response = await fetch('http://localhost:3000/api/ratings', {
-      method: 'POST',
+    const response = await fetch("http://localhost:3000/api/ratings", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         tmdb_id: tmdbId,
-        rating: rating
-      })
+        rating: rating,
+      }),
     });
 
     if (!response.ok) {
@@ -125,22 +135,22 @@ async function rateMovie(tmdbId, rating) {
     const result = await response.json();
 
     if (response.status === 201) {
-      console.log('New rating created:', result.data);
+      console.log("New rating created:", result.data);
     } else if (response.status === 200) {
-      console.log('Rating updated:', result.data);
+      console.log("Rating updated:", result.data);
     }
 
     return result.data;
   } catch (error) {
-    console.error('Failed to rate movie:', error);
+    console.error("Failed to rate movie:", error);
     throw error;
   }
 }
 
 // Usage
 rateMovie(550, 9)
-  .then(rating => console.log('Success:', rating))
-  .catch(error => console.error('Error:', error));
+  .then((rating) => console.log("Success:", rating))
+  .catch((error) => console.error("Error:", error));
 ```
 
 ---
@@ -150,7 +160,9 @@ rateMovie(550, 9)
 ### Validation Errors (400 Bad Request)
 
 #### Invalid Rating (> 10)
+
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ratings \
   -H "Content-Type: application/json" \
@@ -158,6 +170,7 @@ curl -X POST http://localhost:3000/api/ratings \
 ```
 
 **Response:**
+
 ```json
 HTTP/1.1 400 Bad Request
 
@@ -179,7 +192,9 @@ HTTP/1.1 400 Bad Request
 ```
 
 #### Invalid Rating (< 1)
+
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ratings \
   -H "Content-Type: application/json" \
@@ -187,6 +202,7 @@ curl -X POST http://localhost:3000/api/ratings \
 ```
 
 **Response:**
+
 ```json
 HTTP/1.1 400 Bad Request
 
@@ -208,7 +224,9 @@ HTTP/1.1 400 Bad Request
 ```
 
 #### Invalid TMDb ID (Negative)
+
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ratings \
   -H "Content-Type: application/json" \
@@ -216,6 +234,7 @@ curl -X POST http://localhost:3000/api/ratings \
 ```
 
 **Response:**
+
 ```json
 HTTP/1.1 400 Bad Request
 
@@ -237,7 +256,9 @@ HTTP/1.1 400 Bad Request
 ```
 
 #### Malformed JSON
+
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ratings \
   -H "Content-Type: application/json" \
@@ -245,6 +266,7 @@ curl -X POST http://localhost:3000/api/ratings \
 ```
 
 **Response:**
+
 ```json
 HTTP/1.1 400 Bad Request
 
@@ -255,7 +277,9 @@ HTTP/1.1 400 Bad Request
 ```
 
 #### Missing Required Field
+
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ratings \
   -H "Content-Type: application/json" \
@@ -263,6 +287,7 @@ curl -X POST http://localhost:3000/api/ratings \
 ```
 
 **Response:**
+
 ```json
 HTTP/1.1 400 Bad Request
 
@@ -286,11 +311,13 @@ HTTP/1.1 400 Bad Request
 ## Security Considerations
 
 ### Current Implementation (Development)
+
 - Uses `DEFAULT_USER_ID` from environment variables
 - No JWT authentication implemented yet
 - RLS policies on the database level ensure data isolation
 
 ### Planned Production Implementation
+
 ```typescript
 // Get user session from Supabase
 const session = await locals.supabase.auth.getSession();
@@ -299,7 +326,7 @@ if (!session.data.session) {
   return new Response(
     JSON.stringify({
       error: "Unauthorized",
-      message: "User not authenticated"
+      message: "User not authenticated",
     }),
     { status: 401 }
   );
@@ -309,7 +336,9 @@ const userId = session.data.session.user.id;
 ```
 
 ### RLS Policies
+
 The database enforces Row Level Security (RLS) policies to ensure:
+
 - Users can only create/update their own ratings
 - Users can only read their own ratings
 - All operations are scoped to `auth.uid()`
@@ -331,6 +360,7 @@ The database enforces Row Level Security (RLS) policies to ensure:
 ## Performance Notes
 
 Based on test results:
+
 - **CREATE operation**: ~265ms (includes database insert)
 - **UPDATE operation**: ~6ms (database update only)
 - **Validation errors**: ~1ms (rejected before database call)

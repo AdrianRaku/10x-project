@@ -7,6 +7,7 @@
 ## Zainstalowane narzędzia
 
 ### Vitest (Testy jednostkowe i integracyjne)
+
 - vitest v4.0.15
 - @vitest/ui
 - @testing-library/react
@@ -16,6 +17,7 @@
 - @vitejs/plugin-react
 
 ### Playwright (Testy E2E)
+
 - @playwright/test v1.57.0
 - Chromium browser (v143.0.7499.4)
 
@@ -47,6 +49,7 @@ project/
 ## Pliki konfiguracyjne
 
 ### vitest.config.ts
+
 - Environment: happy-dom (lżejsza alternatywa dla jsdom)
 - Globals enabled
 - Setup file: src/test/setup.ts
@@ -54,6 +57,7 @@ project/
 - Alias: @ -> ./src
 
 ### playwright.config.ts
+
 - Browser: Chromium only (Desktop Chrome)
 - Base URL: http://localhost:4321
 - Trace: on-first-retry
@@ -62,6 +66,7 @@ project/
 - Auto web server start
 
 ### src/test/setup.ts
+
 - Jest-dom matchers dla expect
 - Automatic cleanup po każdym teście
 - Mock window.matchMedia
@@ -84,12 +89,14 @@ project/
 ## Przykładowe testy
 
 ### utils.test.ts (5 testów)
+
 - Test funkcji cn do łączenia klas CSS
 - Testy z Tailwind merge
 - Obsługa conditional classes
 - Obsługa null/undefined
 
 ### button.test.tsx (7 testów)
+
 - Renderowanie z różnymi wariantami
 - Różne rozmiary
 - Click handlers
@@ -98,6 +105,7 @@ project/
 - asChild prop (Radix Slot)
 
 ### login.spec.ts (5 testów E2E)
+
 - Sprawdzenie tytułu strony
 - Wyświetlanie elementów formularza
 - Link do rejestracji
@@ -105,6 +113,7 @@ project/
 - Nawigacja
 
 ### login-pom.spec.ts (4 testy E2E z POM)
+
 - Przykład użycia Page Object Model
 - Lepsze zarządzanie lokatorami
 - Większa maintainability

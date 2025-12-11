@@ -10,11 +10,11 @@
 
   /* Border Radius - Fluent UI 2 scale */
   --radius-none: 0;
-  --radius-small: 0.25rem;     /* 4px - chips, tags */
-  --radius-medium: 0.5rem;     /* 8px - buttons, inputs */
-  --radius-large: 0.75rem;     /* 12px - cards, panels */
-  --radius-xlarge: 1rem;       /* 16px - dialogs, sheets */
-  --radius-circular: 9999px;   /* pill/avatar shapes */
+  --radius-small: 0.25rem; /* 4px - chips, tags */
+  --radius-medium: 0.5rem; /* 8px - buttons, inputs */
+  --radius-large: 0.75rem; /* 12px - cards, panels */
+  --radius-xlarge: 1rem; /* 16px - dialogs, sheets */
+  --radius-circular: 9999px; /* pill/avatar shapes */
 
   /* Neutral Colors - Fluent UI 2 neutral palette */
   --neutral-1: oklch(0.99 0 0);
@@ -24,42 +24,42 @@
   --neutral-16: oklch(0.95 0 0);
   --neutral-20: oklch(0.94 0 0);
   --neutral-24: oklch(0.92 0 0);
-  --neutral-28: oklch(0.90 0 0);
+  --neutral-28: oklch(0.9 0 0);
   --neutral-32: oklch(0.88 0 0);
   --neutral-36: oklch(0.86 0 0);
   --neutral-40: oklch(0.84 0 0);
-  --neutral-48: oklch(0.80 0 0);
+  --neutral-48: oklch(0.8 0 0);
   --neutral-56: oklch(0.75 0 0);
-  --neutral-64: oklch(0.70 0 0);
+  --neutral-64: oklch(0.7 0 0);
   --neutral-72: oklch(0.65 0 0);
-  --neutral-80: oklch(0.60 0 0);
+  --neutral-80: oklch(0.6 0 0);
   --neutral-88: oklch(0.55 0 0);
-  --neutral-96: oklch(0.50 0 0);
+  --neutral-96: oklch(0.5 0 0);
   --neutral-104: oklch(0.45 0 0);
-  --neutral-112: oklch(0.40 0 0);
+  --neutral-112: oklch(0.4 0 0);
   --neutral-120: oklch(0.35 0 0);
-  --neutral-128: oklch(0.30 0 0);
+  --neutral-128: oklch(0.3 0 0);
   --neutral-136: oklch(0.25 0 0);
-  --neutral-144: oklch(0.20 0 0);
+  --neutral-144: oklch(0.2 0 0);
   --neutral-152: oklch(0.15 0 0);
-  --neutral-160: oklch(0.10 0 0);
+  --neutral-160: oklch(0.1 0 0);
 
   /* Brand Colors - Fluent Blue */
   --brand-10: oklch(0.95 0.05 264);
-  --brand-20: oklch(0.90 0.08 264);
+  --brand-20: oklch(0.9 0.08 264);
   --brand-30: oklch(0.82 0.12 264);
   --brand-40: oklch(0.74 0.16 264);
   --brand-50: oklch(0.66 0.19 264);
-  --brand-60: oklch(0.58 0.22 264);  /* Primary brand */
-  --brand-70: oklch(0.52 0.24 264);  /* Hover */
-  --brand-80: oklch(0.46 0.26 264);  /* Pressed */
-  --brand-90: oklch(0.40 0.26 264);
+  --brand-60: oklch(0.58 0.22 264); /* Primary brand */
+  --brand-70: oklch(0.52 0.24 264); /* Hover */
+  --brand-80: oklch(0.46 0.26 264); /* Pressed */
+  --brand-90: oklch(0.4 0.26 264);
   --brand-100: oklch(0.34 0.24 264);
-  --brand-110: oklch(0.28 0.20 264);
+  --brand-110: oklch(0.28 0.2 264);
   --brand-120: oklch(0.22 0.16 264);
   --brand-130: oklch(0.18 0.12 264);
   --brand-140: oklch(0.14 0.08 264);
-  --brand-150: oklch(0.10 0.05 264);
+  --brand-150: oklch(0.1 0.05 264);
   --brand-160: oklch(0.06 0.03 264);
 
   /* Semantic Colors */
@@ -68,21 +68,21 @@
   --success-30: oklch(0.78 0.12 145);
   --success-40: oklch(0.68 0.14 145);
   --success-50: oklch(0.58 0.16 145);
-  --success-60: oklch(0.52 0.16 145);  /* Primary success */
+  --success-60: oklch(0.52 0.16 145); /* Primary success */
 
   --warning-10: oklch(0.96 0.04 85);
   --warning-20: oklch(0.92 0.08 85);
   --warning-30: oklch(0.86 0.12 85);
   --warning-40: oklch(0.78 0.16 85);
-  --warning-50: oklch(0.70 0.18 85);   /* Primary warning */
-  --warning-60: oklch(0.62 0.20 85);
+  --warning-50: oklch(0.7 0.18 85); /* Primary warning */
+  --warning-60: oklch(0.62 0.2 85);
 
   --error-10: oklch(0.96 0.04 25);
   --error-20: oklch(0.92 0.08 25);
   --error-30: oklch(0.84 0.14 25);
   --error-40: oklch(0.74 0.18 25);
   --error-50: oklch(0.64 0.22 25);
-  --error-60: oklch(0.56 0.24 25);     /* Primary error */
+  --error-60: oklch(0.56 0.24 25); /* Primary error */
   --error-70: oklch(0.48 0.24 25);
 
   /* Elevation Shadows - Light Mode */
@@ -99,31 +99,31 @@
   --stroke-thicker: 3px;
 
   /* Spacing - 4px base unit */
-  --spacing-xxs: 0.125rem;   /* 2px */
-  --spacing-xs: 0.25rem;     /* 4px */
-  --spacing-s: 0.5rem;       /* 8px */
+  --spacing-xxs: 0.125rem; /* 2px */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-s: 0.5rem; /* 8px */
   --spacing-sNudge: 0.625rem; /* 10px */
-  --spacing-m: 0.75rem;      /* 12px */
+  --spacing-m: 0.75rem; /* 12px */
   --spacing-mNudge: 0.875rem; /* 14px */
-  --spacing-l: 1rem;         /* 16px */
-  --spacing-xl: 1.25rem;     /* 20px */
-  --spacing-xxl: 1.5rem;     /* 24px */
-  --spacing-xxxl: 2rem;      /* 32px */
+  --spacing-l: 1rem; /* 16px */
+  --spacing-xl: 1.25rem; /* 20px */
+  --spacing-xxl: 1.5rem; /* 24px */
+  --spacing-xxxl: 2rem; /* 32px */
 
   /* Typography */
-  --font-family-base: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
-  --font-family-monospace: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  --font-family-base: "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
+  --font-family-monospace: "Cascadia Code", "Consolas", "Courier New", monospace;
 
-  --font-size-100: 0.625rem;   /* 10px - caption */
-  --font-size-200: 0.75rem;    /* 12px - caption */
-  --font-size-300: 0.875rem;   /* 14px - body small */
-  --font-size-400: 1rem;       /* 16px - body */
-  --font-size-500: 1.125rem;   /* 18px - subtitle 2 */
-  --font-size-600: 1.25rem;    /* 20px - subtitle 1 */
-  --font-size-700: 1.75rem;    /* 28px - title 3 */
-  --font-size-800: 2rem;       /* 32px - title 2 */
-  --font-size-900: 2.5rem;     /* 40px - title 1 */
-  --font-size-1000: 4.25rem;   /* 68px - display */
+  --font-size-100: 0.625rem; /* 10px - caption */
+  --font-size-200: 0.75rem; /* 12px - caption */
+  --font-size-300: 0.875rem; /* 14px - body small */
+  --font-size-400: 1rem; /* 16px - body */
+  --font-size-500: 1.125rem; /* 18px - subtitle 2 */
+  --font-size-600: 1.25rem; /* 20px - subtitle 1 */
+  --font-size-700: 1.75rem; /* 28px - title 3 */
+  --font-size-800: 2rem; /* 32px - title 2 */
+  --font-size-900: 2.5rem; /* 40px - title 1 */
+  --font-size-1000: 4.25rem; /* 68px - display */
 
   --line-height-100: 1.2;
   --line-height-200: 1.33;

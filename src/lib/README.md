@@ -33,6 +33,7 @@ src/lib/
 ## 🎯 Wzorce projektowe
 
 ### 1. Repository Pattern
+
 **Pliki:** `repositories/*.ts`
 
 Separacja logiki dostępu do danych od logiki biznesowej.
@@ -43,18 +44,17 @@ const ratings = await repository.getUserRatings(userId);
 ```
 
 ### 2. Builder Pattern
+
 **Plik:** `services/recommendations/PromptBuilder.ts`
 
 Elastyczne budowanie obiektów z wieloma parametrami.
 
 ```typescript
-const prompt = new PromptBuilder()
-  .withRatings(ratings)
-  .withUserContext(context)
-  .buildSystemPrompt();
+const prompt = new PromptBuilder().withRatings(ratings).withUserContext(context).buildSystemPrompt();
 ```
 
 ### 3. Strategy Pattern
+
 **Pliki:** `services/recommendations/strategies/*.ts`
 
 Wymienne algorytmy dla różnych przypadków użycia.
@@ -65,6 +65,7 @@ const recommendations = await strategy.generate(userId, prompt);
 ```
 
 ### 4. Facade Pattern
+
 **Pliki:** `services/tmdb/*.ts`
 
 Uproszczony interfejs dla złożonego API.
@@ -75,6 +76,7 @@ const movie = await moviesService.findMovieByTitleAndYear("Inception", 2010);
 ```
 
 ### 5. Command Pattern
+
 **Plik:** `commands/GenerateRecommendationsCommand.ts`
 
 Enkapsulacja operacji biznesowej.
@@ -85,6 +87,7 @@ const result = await command.execute(params);
 ```
 
 ### 6. Result Pattern
+
 **Plik:** `utils/Result.ts`
 
 Funkcyjne zarządzanie błędami.
@@ -97,6 +100,7 @@ if (!result.success) {
 ```
 
 ### 7. Middleware Pattern
+
 **Plik:** `middleware/validation.middleware.ts`
 
 Reużywalna logika pre-processing.
@@ -128,15 +132,17 @@ Testy znajdują się w: `src/test/unit/*.test.ts`
 ## 🚀 Quick Start
 
 1. **Import nowych modułów:**
+
    ```typescript
    import { RatingRepository } from "@/lib/repositories/RatingRepository";
    import { MoviesServiceRefactored } from "@/lib/services/movies.service.refactored";
    ```
 
 2. **Użyj w endpoint:**
+
    ```typescript
    import { requireAuth, validateRequest } from "@/lib/middleware/validation.middleware";
-   
+
    export const POST: APIRoute = async (context) => {
      const authResult = requireAuth(context);
      if (!authResult.success) return authResult.response;
@@ -145,9 +151,10 @@ Testy znajdują się w: `src/test/unit/*.test.ts`
    ```
 
 3. **Napisz testy:**
+
    ```typescript
    import { describe, it, expect, vi } from "vitest";
-   
+
    describe("MyModule", () => {
      it("should work", async () => {
        // Test logic
@@ -163,6 +170,7 @@ Testy znajdują się w: `src/test/unit/*.test.ts`
 ```
 
 Lub ręcznie:
+
 1. Zamień import ze starego na nowy moduł
 2. Dostosuj wywołania API (jeśli potrzebne)
 3. Uruchom testy
@@ -172,6 +180,7 @@ Lub ręcznie:
 Nowe moduły mają nieco inny interfejs niż stare:
 
 ### RecommendationsService
+
 ```typescript
 // Stary
 await service.generateRecommendations(userId, prompt, supabase, apiKey);
@@ -181,6 +190,7 @@ await service.generateRecommendations(userId, prompt, supabase, apiKey);
 ```
 
 ### MoviesService
+
 ```typescript
 // Stary
 const service = new MoviesService(apiKey);
@@ -192,19 +202,25 @@ const service = new MoviesServiceRefactored(apiKey, cache); // cache optional
 ## 🐛 Troubleshooting
 
 ### Problem: TypeScript nie znajduje typów
+
 **Rozwiązanie:** Przebuduj projekt
+
 ```bash
 npm run build
 ```
 
 ### Problem: Testy nie przechodzą
+
 **Rozwiązanie:** Sprawdź mocki i importy
+
 ```typescript
 import type { SupabaseClient } from "@/db/supabase.client";
 ```
 
 ### Problem: Cache nie działa
+
 **Rozwiązanie:** Upewnij się, że przekazujesz instancję CacheService
+
 ```typescript
 const cache = new CacheService();
 const service = new MoviesServiceRefactored(apiKey, cache);
@@ -228,16 +244,15 @@ const service = new MoviesServiceRefactored(apiKey, cache);
 
 ## 📊 Metryki
 
-| Metryka | Wartość |
-|---------|---------|
-| Średnia LOC na plik | ~95 |
-| Pokrycie testami | ~60% (cel: 80%) |
-| Złożoność cyklomatyczna | ~6 |
-| Duplikacja kodu | ~3% |
+| Metryka                 | Wartość         |
+| ----------------------- | --------------- |
+| Średnia LOC na plik     | ~95             |
+| Pokrycie testami        | ~60% (cel: 80%) |
+| Złożoność cyklomatyczna | ~6              |
+| Duplikacja kodu         | ~3%             |
 
 ---
 
 **Wersja:** 1.0.0  
 **Data:** 2025-12-09  
 **Autor:** GitHub Copilot
-

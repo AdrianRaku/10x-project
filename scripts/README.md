@@ -25,6 +25,7 @@ node scripts/test-supabase-login.js
 Creates a test user in Supabase Authentication for E2E testing.
 
 **Requirements:**
+
 - `SUPABASE_SERVICE_ROLE_KEY` must be set in `.env.test`
 - Get this key from Supabase Dashboard → Settings → API → service_role key
 
@@ -37,6 +38,7 @@ node scripts/create-test-user.js
 Resets the password for an existing test user to match `.env.test`.
 
 **Requirements:**
+
 - `SUPABASE_SERVICE_ROLE_KEY` must be set in `.env.test`
 - User must already exist in Supabase
 
@@ -49,11 +51,13 @@ node scripts/reset-test-user-password.js
 ### First Time Setup
 
 1. Check environment variables:
+
    ```bash
    node scripts/check-test-env.js
    ```
 
 2. Create test user:
+
    ```bash
    # First, add SUPABASE_SERVICE_ROLE_KEY to .env.test
    node scripts/create-test-user.js
@@ -69,6 +73,7 @@ node scripts/reset-test-user-password.js
 If E2E tests fail with authentication errors:
 
 1. Test the credentials:
+
    ```bash
    node scripts/test-supabase-login.js
    ```

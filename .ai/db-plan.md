@@ -6,15 +6,15 @@
 
 Przechowuje oceny filmów wystawione przez użytkowników.
 
-| Nazwa kolumny | Typ danych    | Ograniczenia                                                              | Opis                                                 |
-| :------------ | :------------ | :------------------------------------------------------------------------ | :--------------------------------------------------- |
-| `id`          | `bigint`      | `PRIMARY KEY`, `GENERATED ALWAYS AS IDENTITY`                             | Unikalny identyfikator oceny.                        |
-| `user_id`     | `uuid`        | `NOT NULL`, `FOREIGN KEY REFERENCES auth.users(id) ON DELETE CASCADE`     | Identyfikator użytkownika z tabeli `auth.users`.     |
-| `tmdb_id`     | `integer`     | `NOT NULL`                                                                | Identyfikator filmu z API The Movie Database (TMDb). |
-| `rating`      | `smallint`    | `NOT NULL`, `CHECK (rating >= 1 AND rating <= 10)`                        | Ocena filmu w skali od 1 do 10.                      |
-| `created_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                               | Znacznik czasowy utworzenia rekordu.                 |
-| `updated_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                               | Znacznik czasowy ostatniej aktualizacji rekordu.     |
-|               |               | `UNIQUE (user_id, tmdb_id)`                                               | Zapewnia, że użytkownik może ocenić dany film tylko raz. |
+| Nazwa kolumny | Typ danych    | Ograniczenia                                                          | Opis                                                     |
+| :------------ | :------------ | :-------------------------------------------------------------------- | :------------------------------------------------------- |
+| `id`          | `bigint`      | `PRIMARY KEY`, `GENERATED ALWAYS AS IDENTITY`                         | Unikalny identyfikator oceny.                            |
+| `user_id`     | `uuid`        | `NOT NULL`, `FOREIGN KEY REFERENCES auth.users(id) ON DELETE CASCADE` | Identyfikator użytkownika z tabeli `auth.users`.         |
+| `tmdb_id`     | `integer`     | `NOT NULL`                                                            | Identyfikator filmu z API The Movie Database (TMDb).     |
+| `rating`      | `smallint`    | `NOT NULL`, `CHECK (rating >= 1 AND rating <= 10)`                    | Ocena filmu w skali od 1 do 10.                          |
+| `created_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                           | Znacznik czasowy utworzenia rekordu.                     |
+| `updated_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                           | Znacznik czasowy ostatniej aktualizacji rekordu.         |
+|               |               | `UNIQUE (user_id, tmdb_id)`                                           | Zapewnia, że użytkownik może ocenić dany film tylko raz. |
 
 ### Typ ENUM: `list_type`
 
@@ -28,24 +28,24 @@ CREATE TYPE public.list_type AS ENUM ('watchlist', 'favorite');
 
 Przechowuje filmy dodane przez użytkowników do list personalnych ("Do obejrzenia", "Ulubione").
 
-| Nazwa kolumny | Typ danych    | Ograniczenia                                                              | Opis                                                 |
-| :------------ | :------------ | :------------------------------------------------------------------------ | :--------------------------------------------------- |
-| `id`          | `bigint`      | `PRIMARY KEY`, `GENERATED ALWAYS AS IDENTITY`                             | Unikalny identyfikator wpisu na liście.              |
-| `user_id`     | `uuid`        | `NOT NULL`, `FOREIGN KEY REFERENCES auth.users(id) ON DELETE CASCADE`     | Identyfikator użytkownika z tabeli `auth.users`.     |
-| `tmdb_id`     | `integer`     | `NOT NULL`                                                                | Identyfikator filmu z API The Movie Database (TMDb). |
-| `list_type`   | `list_type`   | `NOT NULL`                                                                | Typ listy, do której należy film (`watchlist` lub `favorite`). |
-| `created_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                               | Znacznik czasowy utworzenia rekordu.                 |
-|               |               | `UNIQUE (user_id, tmdb_id, list_type)`                                    | Zapewnia, że film nie zostanie zduplikowany na tej samej liście dla danego użytkownika. |
+| Nazwa kolumny | Typ danych    | Ograniczenia                                                          | Opis                                                                                    |
+| :------------ | :------------ | :-------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- |
+| `id`          | `bigint`      | `PRIMARY KEY`, `GENERATED ALWAYS AS IDENTITY`                         | Unikalny identyfikator wpisu na liście.                                                 |
+| `user_id`     | `uuid`        | `NOT NULL`, `FOREIGN KEY REFERENCES auth.users(id) ON DELETE CASCADE` | Identyfikator użytkownika z tabeli `auth.users`.                                        |
+| `tmdb_id`     | `integer`     | `NOT NULL`                                                            | Identyfikator filmu z API The Movie Database (TMDb).                                    |
+| `list_type`   | `list_type`   | `NOT NULL`                                                            | Typ listy, do której należy film (`watchlist` lub `favorite`).                          |
+| `created_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                           | Znacznik czasowy utworzenia rekordu.                                                    |
+|               |               | `UNIQUE (user_id, tmdb_id, list_type)`                                | Zapewnia, że film nie zostanie zduplikowany na tej samej liście dla danego użytkownika. |
 
 ### Tabela: `ai_recommendation_requests`
 
 Loguje zapytania o rekomendacje AI w celu zarządzania dziennym limitem.
 
-| Nazwa kolumny | Typ danych    | Ograniczenia                                                              | Opis                                             |
-| :------------ | :------------ | :------------------------------------------------------------------------ | :----------------------------------------------- |
-| `id`          | `bigint`      | `PRIMARY KEY`, `GENERATED ALWAYS AS IDENTITY`                             | Unikalny identyfikator zapytania.                |
-| `user_id`     | `uuid`        | `NOT NULL`, `FOREIGN KEY REFERENCES auth.users(id) ON DELETE CASCADE`     | Identyfikator użytkownika z tabeli `auth.users`. |
-| `created_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                               | Znacznik czasowy utworzenia zapytania.           |
+| Nazwa kolumny | Typ danych    | Ograniczenia                                                          | Opis                                             |
+| :------------ | :------------ | :-------------------------------------------------------------------- | :----------------------------------------------- |
+| `id`          | `bigint`      | `PRIMARY KEY`, `GENERATED ALWAYS AS IDENTITY`                         | Unikalny identyfikator zapytania.                |
+| `user_id`     | `uuid`        | `NOT NULL`, `FOREIGN KEY REFERENCES auth.users(id) ON DELETE CASCADE` | Identyfikator użytkownika z tabeli `auth.users`. |
+| `created_at`  | `timestamptz` | `NOT NULL`, `DEFAULT now()`                                           | Znacznik czasowy utworzenia zapytania.           |
 
 ## 2. Relacje Między Tabelami
 
@@ -135,4 +135,3 @@ WITH CHECK (auth.uid() = user_id);
   CREATE TRIGGER handle_updated_at BEFORE UPDATE ON public.ratings
   FOR EACH ROW EXECUTE PROCEDURE moddatetime (updated_at);
   ```
-

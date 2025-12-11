@@ -12,6 +12,7 @@
 ### 2.1. Ratings
 
 #### Get All User Ratings
+
 - **Method**: `GET`
 - **Path**: `/api/ratings`
 - **Description**: Retrieves all movie ratings for the currently authenticated user.
@@ -34,6 +35,7 @@
 - **Error Codes**: `401 Unauthorized`
 
 #### Add or Update a Movie Rating
+
 - **Method**: `POST`
 - **Path**: `/api/ratings`
 - **Description**: Creates a new rating for a movie or updates an existing one for the authenticated user. This "upsert" logic simplifies client-side operations.
@@ -59,6 +61,7 @@
 - **Error Codes**: `400 Bad Request`, `401 Unauthorized`, `422 Unprocessable Entity`
 
 #### Delete a Movie Rating
+
 - **Method**: `DELETE`
 - **Path**: `/api/ratings/:tmdb_id`
 - **Description**: Deletes a specific movie rating for the authenticated user.
@@ -70,6 +73,7 @@
 ### 2.2. User Lists
 
 #### Get User's Lists
+
 - **Method**: `GET`
 - **Path**: `/api/lists`
 - **Description**: Retrieves all movies on the user's 'watchlist' and 'favorite' lists.
@@ -78,12 +82,8 @@
   ```json
   {
     "data": {
-      "watchlist": [
-        { "tmdb_id": 456, "created_at": "2025-11-20T10:00:00Z" }
-      ],
-      "favorite": [
-        { "tmdb_id": 789, "created_at": "2025-11-19T10:00:00Z" }
-      ]
+      "watchlist": [{ "tmdb_id": 456, "created_at": "2025-11-20T10:00:00Z" }],
+      "favorite": [{ "tmdb_id": 789, "created_at": "2025-11-19T10:00:00Z" }]
     }
   }
   ```
@@ -91,6 +91,7 @@
 - **Error Codes**: `401 Unauthorized`
 
 #### Add a Movie to a List
+
 - **Method**: `POST`
 - **Path**: `/api/lists`
 - **Description**: Adds a movie to a specified list ('watchlist' or 'favorite') for the authenticated user.
@@ -115,6 +116,7 @@
 - **Error Codes**: `400 Bad Request`, `401 Unauthorized`, `409 Conflict` (if already in list), `422 Unprocessable Entity`
 
 #### Remove a Movie from a List
+
 - **Method**: `DELETE`
 - **Path**: `/api/lists/:list_type/:tmdb_id`
 - **Description**: Removes a movie from a specified list for the authenticated user.
@@ -126,6 +128,7 @@
 ### 2.3. AI Recommendations
 
 #### Generate Movie Recommendations
+
 - **Method**: `POST`
 - **Path**: `/api/recommendations`
 - **Description**: Generates movie recommendations based on the user's rating history and an optional text prompt.
@@ -153,6 +156,7 @@
 ### 2.4. Movies (TMDb Proxy)
 
 #### Search for Movies
+
 - **Method**: `GET`
 - **Path**: `/api/movies/search`
 - **Description**: Searches for movies on TMDb using a query string. This endpoint acts as a secure proxy to the TMDb API.
@@ -189,4 +193,3 @@
   - **Recommendation Prerequisite**: The `POST /api/recommendations` endpoint will first query the `ratings` table to count the user's ratings. If the count is less than 10, it will return a `403 Forbidden` error.
   - **Rate Limiting**: The `POST /api/recommendations` endpoint will check the `ai_recommendation_requests` table. It will count entries for the current user within the last 24 hours. If the count is 3 or more, it will return a `429 Too Many Requests` error. On a successful request, it will insert a new record into this table.
   - **Upsert Logic**: The `POST /api/ratings` endpoint will implement an "upsert" (update or insert) pattern. It will attempt to insert a new rating and, if a unique constraint violation occurs (meaning a rating for that movie by that user already exists), it will perform an update instead.
-

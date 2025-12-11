@@ -9,61 +9,66 @@ Aplikacja jest chroniona "ścianą uwierzytelniania" – dostęp do większości
 ## 2. Lista widoków
 
 ### 1. Strona logowania
+
 - **Nazwa widoku:** Logowanie
 - **Ścieżka widoku:** `/login`
 - **Główny cel:** Uwierzytelnienie istniejącego użytkownika.
 - **Kluczowe informacje do wyświetlenia:** Formularz z polami na e-mail i hasło, link do strony rejestracji.
 - **Kluczowe komponenty widoku:** `LoginForm.tsx` (komponent React z logiką walidacji i obsługą stanu formularza).
 - **UX, dostępność i względy bezpieczeństwa:**
-    - **UX:** Wyraźne komunikaty o błędach (np. "Nieprawidłowy e-mail lub hasło") wyświetlane bez przeładowania strony. Stan ładowania na przycisku po wysłaniu formularza.
-    - **Dostępność:** Pola formularza powiązane z etykietami (`<label>`), walidacja `aria-live` dla błędów.
-    - **Bezpieczeństwo:** Komunikacja z API przez HTTPS. Endpoint API obsługuje logikę uwierzytelniania.
+  - **UX:** Wyraźne komunikaty o błędach (np. "Nieprawidłowy e-mail lub hasło") wyświetlane bez przeładowania strony. Stan ładowania na przycisku po wysłaniu formularza.
+  - **Dostępność:** Pola formularza powiązane z etykietami (`<label>`), walidacja `aria-live` dla błędów.
+  - **Bezpieczeństwo:** Komunikacja z API przez HTTPS. Endpoint API obsługuje logikę uwierzytelniania.
 
 ### 2. Strona rejestracji
+
 - **Nazwa widoku:** Rejestracja
 - **Ścieżka widoku:** `/register`
 - **Główny cel:** Utworzenie nowego konta użytkownika.
 - **Kluczowe informacje do wyświetlenia:** Formularz z polami na e-mail i hasło, link do strony logowania.
 - **Kluczowe komponenty widoku:** `RegisterForm.tsx` (komponent React z logiką walidacji).
 - **UX, dostępność i względy bezpieczeństwa:**
-    - **UX:** Informacja zwrotna o zajętym adresie e-mail. Wymagania dotyczące hasła (jeśli istnieją) powinny być jasno określone.
-    - **Dostępność:** Podobne standardy jak w formularzu logowania.
-    - **Bezpieczeństwo:** Endpoint API zapobiega tworzeniu duplikatów kont.
+  - **UX:** Informacja zwrotna o zajętym adresie e-mail. Wymagania dotyczące hasła (jeśli istnieją) powinny być jasno określone.
+  - **Dostępność:** Podobne standardy jak w formularzu logowania.
+  - **Bezpieczeństwo:** Endpoint API zapobiega tworzeniu duplikatów kont.
 
 ### 3. Strona główna
+
 - **Nazwa widoku:** Strona główna
 - **Ścieżka widoku:** `/`
 - **Główny cel:** Zapewnienie głównej funkcjonalności aplikacji w zależności od stanu użytkownika (onboarding lub generowanie rekomendacji).
 - **Kluczowe informacje do wyświetlenia:**
-    - **Widok Onboardingu (dla użytkowników z < 10 ocenami):** Komunikat powitalny, wyszukiwarka filmów.
-    - **Widok Rekomendacji (dla użytkowników z >= 10 ocenami):** Przycisk do generowania rekomendacji, opcjonalne pole tekstowe (prompt), wyświetlone rekomendacje.
+  - **Widok Onboardingu (dla użytkowników z < 10 ocenami):** Komunikat powitalny, wyszukiwarka filmów.
+  - **Widok Rekomendacji (dla użytkowników z >= 10 ocenami):** Przycisk do generowania rekomendacji, opcjonalne pole tekstowe (prompt), wyświetlone rekomendacje.
 - **Kluczowe komponenty widoku:** `MovieSearch.tsx`, `RecommendationGenerator.tsx`, `MovieCard.tsx`.
 - **UX, dostępność i względy bezpieczeństwa:**
-    - **UX:** Natychmiastowa informacja zwrotna podczas wyszukiwania. Szkielety (skeletons) podczas ładowania rekomendacji. Komunikat o osiągnięciu dziennego limitu rekomendacji.
-    - **Dostępność:** Wyszukiwarka z odpowiednimi atrybutami ARIA. Rekomendacje przedstawione jako lista.
-    - **Bezpieczeństwo:** Logika biznesowa (sprawdzanie liczby ocen, limitu zapytań) jest walidowana zarówno po stronie klienta (dla UX), jak i serwera (dla bezpieczeństwa).
+  - **UX:** Natychmiastowa informacja zwrotna podczas wyszukiwania. Szkielety (skeletons) podczas ładowania rekomendacji. Komunikat o osiągnięciu dziennego limitu rekomendacji.
+  - **Dostępność:** Wyszukiwarka z odpowiednimi atrybutami ARIA. Rekomendacje przedstawione jako lista.
+  - **Bezpieczeństwo:** Logika biznesowa (sprawdzanie liczby ocen, limitu zapytań) jest walidowana zarówno po stronie klienta (dla UX), jak i serwera (dla bezpieczeństwa).
 
 ### 4. Strona szczegółów filmu
+
 - **Nazwa widoku:** Szczegóły filmu
 - **Ścieżka widoku:** `/movie/[tmdb_id]`
 - **Główny cel:** Wyświetlenie szczegółowych informacji o filmie i umożliwienie użytkownikowi interakcji (ocena, dodanie do list).
 - **Kluczowe informacje do wyświetlenia:** Plakat, tytuł, rok produkcji, opis, aktualna ocena użytkownika, przyciski akcji.
 - **Kluczowe komponenty widoku:** `RatingDialog.tsx`, `MovieActions.tsx` (zawierający przyciski "Ulubione" i "Do obejrzenia").
 - **UX, dostępność i względy bezpieczeństwa:**
-    - **UX:** Stan przycisków (np. "Dodaj do ulubionych" vs "Usuń z ulubionych") odzwierciedla aktualny stan z `UserDataProvider`.
-    - **Dostępność:** Plakat filmu z tekstem alternatywnym (`alt`). Przyciski akcji z etykietami `aria-label`.
-    - **Bezpieczeństwo:** Dane filmu pobierane przez serwerowy endpoint proxy, aby ukryć klucz API TMDb.
+  - **UX:** Stan przycisków (np. "Dodaj do ulubionych" vs "Usuń z ulubionych") odzwierciedla aktualny stan z `UserDataProvider`.
+  - **Dostępność:** Plakat filmu z tekstem alternatywnym (`alt`). Przyciski akcji z etykietami `aria-label`.
+  - **Bezpieczeństwo:** Dane filmu pobierane przez serwerowy endpoint proxy, aby ukryć klucz API TMDb.
 
 ### 5. Moje listy
+
 - **Nazwa widoku:** Moje listy
 - **Ścieżka widoku:** `/my-lists`
 - **Główny cel:** Przeglądanie filmów dodanych przez użytkownika do list "Ocenione", "Do obejrzenia" i "Ulubione".
 - **Kluczowe informacje do wyświetlenia:** Siatka kafelków z filmami w obrębie zakładek.
 - **Kluczowe komponenty widoku:** `MyListsTabs.tsx` (komponent React z zakładkami z `shadcn/ui`), `MovieCard.tsx`.
 - **UX, dostępność i względy bezpieczeństwa:**
-    - **UX:** Płynne przełączanie między zakładkami bez przeładowania strony. Dane są pobierane raz przy ładowaniu strony i zarządzane przez `UserDataProvider`.
-    - **Dostępność:** Zakładki zaimplementowane zgodnie ze standardami WAI-ARIA dla `Tabs`.
-    - **Bezpieczeństwo:** Dane pobierane na serwerze w kontekście zalogowanego użytkownika.
+  - **UX:** Płynne przełączanie między zakładkami bez przeładowania strony. Dane są pobierane raz przy ładowaniu strony i zarządzane przez `UserDataProvider`.
+  - **Dostępność:** Zakładki zaimplementowane zgodnie ze standardami WAI-ARIA dla `Tabs`.
+  - **Bezpieczeństwo:** Dane pobierane na serwerze w kontekście zalogowanego użytkownika.
 
 ## 3. Mapa podróży użytkownika
 
@@ -86,11 +91,11 @@ Główny przepływ użytkownika (odkrywanie i ocena filmu):
 - **Dostawca danych (`UserDataProvider`):** Obejmuje całą aplikację, dostarczając dane o ocenach i listach do wszystkich komponentów React.
 - **Dostawca powiadomień (`ToastProvider`):** Również globalny, umożliwia wyświetlanie powiadomień (toastów) z dowolnego miejsca w aplikacji.
 - **Nawigacja główna (`Header.astro`):**
-    - Jest to stały komponent obecny na wszystkich stronach (poza `/login` i `/register`).
-    - Zawiera:
-        - Logo aplikacji (link do strony głównej `/`).
-        - Link do strony "Moje listy" (`/my-lists`).
-        - Przycisk "Wyloguj", który przekierowuje na `GET /api/auth/logout`.
+  - Jest to stały komponent obecny na wszystkich stronach (poza `/login` i `/register`).
+  - Zawiera:
+    - Logo aplikacji (link do strony głównej `/`).
+    - Link do strony "Moje listy" (`/my-lists`).
+    - Przycisk "Wyloguj", który przekierowuje na `GET /api/auth/logout`.
 
 ## 5. Kluczowe komponenty
 
@@ -101,4 +106,3 @@ Główny przepływ użytkownika (odkrywanie i ocena filmu):
 - **`MyListsTabs.tsx`:** Komponent renderujący zakładki ("Ocenione", "Do obejrzenia", "Ulubione") i wyświetlający odpowiednią listę filmów dla aktywnej zakładki.
 - **`Header.astro`:** Statyczny komponent nawigacyjny z linkami i przyciskiem wylogowania.
 - **`UserDataProvider.tsx`:** Globalny dostawca kontekstu React, który przechowuje stan list i ocen użytkownika oraz udostępnia metody do ich modyfikacji (np. `addFavorite`, `rateMovie`).
-

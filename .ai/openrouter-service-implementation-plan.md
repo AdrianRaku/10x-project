@@ -9,23 +9,27 @@
 Konstruktor inicjalizuje usługę, ustawiając klucz API OpenRouter, który jest niezbędny do autoryzacji żądań.
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 // Definicje schematów Zod dla walidacji
 const OpenRouterRequestSchema = z.object({
   model: z.string(),
-  messages: z.array(z.object({
-    role: z.enum(['system', 'user', 'assistant']),
-    content: z.string(),
-  })),
-  response_format: z.optional(z.object({
-    type: z.literal('json_schema'),
-    json_schema: z.object({
-      name: z.string(),
-      strict: z.boolean().optional(),
-      schema: z.record(z.unknown()),
-    }),
-  })),
+  messages: z.array(
+    z.object({
+      role: z.enum(["system", "user", "assistant"]),
+      content: z.string(),
+    })
+  ),
+  response_format: z.optional(
+    z.object({
+      type: z.literal("json_schema"),
+      json_schema: z.object({
+        name: z.string(),
+        strict: z.boolean().optional(),
+        schema: z.record(z.unknown()),
+      }),
+    })
+  ),
   // Inne opcjonalne parametry modelu
   temperature: z.number().optional(),
   max_tokens: z.number().optional(),
@@ -33,17 +37,19 @@ const OpenRouterRequestSchema = z.object({
 
 const OpenRouterResponseSchema = z.object({
   id: z.string(),
-  choices: z.array(z.object({
-    message: z.object({
-      role: z.string(),
-      content: z.string(),
-    }),
-  })),
+  choices: z.array(
+    z.object({
+      message: z.object({
+        role: z.string(),
+        content: z.string(),
+      }),
+    })
+  ),
 });
 
 export class OpenRouterService {
   private apiKey: string;
-  private readonly openRouterApiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+  private readonly openRouterApiUrl = "https://openrouter.ai/api/v1/chat/completions";
 
   /**
    * Tworzy instancję OpenRouterService.
@@ -51,7 +57,7 @@ export class OpenRouterService {
    */
   constructor(apiKey: string) {
     if (!apiKey) {
-      throw new Error('OpenRouter API key is required.');
+      throw new Error("OpenRouter API key is required.");
     }
     this.apiKey = apiKey;
   }
@@ -66,10 +72,10 @@ export class OpenRouterService {
 
 Główna metoda publiczna, która wysyła żądanie do API OpenRouter i zwraca odpowiedź modelu.
 
--   **Parametry:**
-    -   `request`: Obiekt zgodny z `OpenRouterRequestSchema`, zawierający `model`, `messages` i opcjonalne parametry.
--   **Zwraca:** `Promise<z.infer<typeof OpenRouterResponseSchema>>` - Obiekt odpowiedzi z API.
--   **Rzuca:** `Error` w przypadku niepowodzenia żądania lub walidacji.
+- **Parametry:**
+  - `request`: Obiekt zgodny z `OpenRouterRequestSchema`, zawierający `model`, `messages` i opcjonalne parametry.
+- **Zwraca:** `Promise<z.infer<typeof OpenRouterResponseSchema>>` - Obiekt odpowiedzi z API.
+- **Rzuca:** `Error` w przypadku niepowodzenia żądania lub walidacji.
 
 ```typescript
 // Wewnątrz klasy OpenRouterService
@@ -93,7 +99,7 @@ public async generateChatCompletion(request: z.infer<typeof OpenRouterRequestSch
   }
 
   const data = await response.json();
-  
+
   // Walidacja odpowiedzi
   const responseValidation = OpenRouterResponseSchema.safeParse(data);
   if (!responseValidation.success) {
@@ -132,7 +138,7 @@ Usługa implementuje obsługę błędów na kilku poziomach:
 
 ## 6. Kwestie bezpieczeństwa
 
-1.  **Klucz API:**  Należy go przechowywać w zmiennych środowiskowych (`.env`) `import.meta.env.OPENROUTER_API_KEY`.
+1.  **Klucz API:** Należy go przechowywać w zmiennych środowiskowych (`.env`) `import.meta.env.OPENROUTER_API_KEY`.
 2.  **Walidacja danych wejściowych:** Wszystkie dane pochodzące od użytkownika (np. treść wiadomości) muszą być walidowane przed wysłaniem do API, aby zapobiec atakom typu prompt injection.
 3.  **Ekspozycja API:** Usługa `OpenRouterService` powinna być używana wyłącznie po stronie serwera (np. w endpointach API Astro w `src/pages/api`).
 
@@ -140,14 +146,18 @@ Usługa implementuje obsługę błędów na kilku poziomach:
 
 1.  **Instalacja zależności:**
     Upewnij się, że masz zainstalowany `zod`:
+
     ```bash
     npm install zod
     ```
 
 2.  **Konfiguracja zmiennych środowiskowych:**
     Utwórz plik `.env` w głównym katalogu projektu i dodaj swój klucz API:
+
     ```
     OPENROUTER_API_KEY="sk-or-..."
+
+    ```
 
 3.  **Utworzenie pliku usługi:**
     Utwórz nowy plik `src/lib/services/openrouter.service.ts` i wklej do niego kod klasy `OpenRouterService` (połączone fragmenty z sekcji 2, 3 i 4).
@@ -157,9 +167,9 @@ Usługa implementuje obsługę błędów na kilku poziomach:
 
     ```typescript
     // src/pages/api/chat.ts
-    import type { APIRoute } from 'astro';
-    import { OpenRouterService } from '../../lib/services/openrouter.service';
-    import { z } from 'zod';
+    import type { APIRoute } from "astro";
+    import { OpenRouterService } from "../../lib/services/openrouter.service";
+    import { z } from "zod";
 
     // Schemat walidacji dla ciała żądania przychodzącego do naszego API
     const ApiRequestSchema = z.object({
@@ -172,35 +182,37 @@ Usługa implementuje obsługę błędów na kilku poziomach:
         const validation = ApiRequestSchema.safeParse(body);
 
         if (!validation.success) {
-          return new Response(JSON.stringify({ error: 'Invalid input', details: validation.error.flatten() }), { status: 400 });
+          return new Response(JSON.stringify({ error: "Invalid input", details: validation.error.flatten() }), {
+            status: 400,
+          });
         }
 
         const { userMessage } = validation.data;
-        
+
         const apiKey = import.meta.env.OPENROUTER_API_KEY;
         const openRouterService = new OpenRouterService(apiKey);
 
         // Przykład użycia z formatowaniem JSON
         const movieSchema = {
-            type: 'object',
-            properties: {
-                title: { type: 'string', description: 'Tytuł filmu.' },
-                year: { type: 'number', description: 'Rok produkcji.' },
-                director: { type: 'string', description: 'Reżyser filmu.' },
-            },
-            required: ['title', 'year', 'director'],
+          type: "object",
+          properties: {
+            title: { type: "string", description: "Tytuł filmu." },
+            year: { type: "number", description: "Rok produkcji." },
+            director: { type: "string", description: "Reżyser filmu." },
+          },
+          required: ["title", "year", "director"],
         };
 
         const openRouterRequest = {
-          model: 'google/gemini-flash-1.5',
+          model: "google/gemini-flash-1.5",
           messages: [
-            { role: 'system', content: 'Jesteś ekspertem od filmów. Odpowiadaj w formacie JSON.' },
-            { role: 'user', content: `Podaj informacje o filmie: ${userMessage}` },
+            { role: "system", content: "Jesteś ekspertem od filmów. Odpowiadaj w formacie JSON." },
+            { role: "user", content: `Podaj informacje o filmie: ${userMessage}` },
           ],
           response_format: {
-            type: 'json_schema' as const,
+            type: "json_schema" as const,
             json_schema: {
-              name: 'movie_info',
+              name: "movie_info",
               strict: true,
               schema: movieSchema,
             },
@@ -209,66 +221,66 @@ Usługa implementuje obsługę błędów na kilku poziomach:
         };
 
         const result = await openRouterService.generateChatCompletion(openRouterRequest);
-        
+
         // Parsowanie odpowiedzi JSON z contentu
         const content = result.choices[0].message.content;
         const parsedContent = JSON.parse(content);
 
         return new Response(JSON.stringify(parsedContent), {
           status: 200,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         });
-
       } catch (error) {
         console.error(error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-        return new Response(JSON.stringify({ error: 'Internal Server Error', message: errorMessage }), { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        return new Response(JSON.stringify({ error: "Internal Server Error", message: errorMessage }), { status: 500 });
       }
     };
     ```
+
     **Uwaga:** Pamiętaj, aby ustawić `export const prerender = false;` w plikach API, jeśli nie jest to globalnie skonfigurowane.
 
 5.  **Wywołanie z frontendu (przykład w komponencie React):**
     Możesz teraz wywołać ten endpoint z dowolnego komponentu frontendowego.
 
-    ```tsx
-    // Przykład w komponencie React
-    import React, { useState } from 'react';
+        ```tsx
+        // Przykład w komponencie React
+        import React, { useState } from 'react';
 
-    const ChatComponent = () => {
-      const [movie, setMovie] = useState(null);
-      const [loading, setLoading] = useState(false);
+        const ChatComponent = () => {
+          const [movie, setMovie] = useState(null);
+          const [loading, setLoading] = useState(false);
 
-      const handleFetchMovie = async () => {
-        setLoading(true);
-        try {
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userMessage: 'Incepcja' }),
-          });
-          const data = await response.json();
-          if(response.ok) {
-            setMovie(data);
-          } else {
-            console.error(data.error);
-          }
-        } catch (error) {
-          console.error('Failed to fetch chat completion:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
+          const handleFetchMovie = async () => {
+            setLoading(true);
+            try {
+              const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userMessage: 'Incepcja' }),
+              });
+              const data = await response.json();
+              if(response.ok) {
+                setMovie(data);
+              } else {
+                console.error(data.error);
+              }
+            } catch (error) {
+              console.error('Failed to fetch chat completion:', error);
+            } finally {
+              setLoading(false);
+            }
+          };
 
-      return (
-        <div>
-          <button onClick={handleFetchMovie} disabled={loading}>
-            {loading ? 'Ładowanie...' : 'Pobierz info o filmie'}
-          </button>
-          {movie && <pre>{JSON.stringify(movie, null, 2)}</pre>}
-        </div>
-      );
-    };
-    ```
-Powyższy plan zapewnia solidne podstawy do wdrożenia niezawodnej i bezpiecznej usługi do interakcji z API OpenRouter w Twoim projekcie.
+          return (
+            <div>
+              <button onClick={handleFetchMovie} disabled={loading}>
+                {loading ? 'Ładowanie...' : 'Pobierz info o filmie'}
+              </button>
+              {movie && <pre>{JSON.stringify(movie, null, 2)}</pre>}
+            </div>
+          );
+        };
+        ```
 
+    Powyższy plan zapewnia solidne podstawy do wdrożenia niezawodnej i bezpiecznej usługi do interakcji z API OpenRouter w Twoim projekcie.

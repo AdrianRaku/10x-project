@@ -3,6 +3,7 @@
 ## Overview
 
 Ten projekt wykorzystuje dwa frameworki testowe:
+
 - **Vitest** - dla testów jednostkowych i integracyjnych
 - **Playwright** - dla testów E2E (end-to-end)
 
@@ -45,6 +46,7 @@ npm run test:coverage
 ### Konfiguracja
 
 Vitest jest skonfigurowany do:
+
 - Używania środowiska **happy-dom** dla testów komponentów React (lżejsza i szybsza alternatywa dla jsdom)
 - Automatycznego ładowania pliku setup z globalnymi konfiguracjami
 - Wykluczania node_modules, dist i testów E2E
@@ -53,19 +55,21 @@ Vitest jest skonfigurowany do:
 ### Przykłady testów
 
 #### Test funkcji utility (utils.test.ts)
-```typescript
-import { describe, it, expect } from 'vitest';
-import { cn } from './utils';
 
-describe('cn utility function', () => {
-  it('merges class names correctly', () => {
-    const result = cn('foo', 'bar');
-    expect(result).toBe('foo bar');
+```typescript
+import { describe, it, expect } from "vitest";
+import { cn } from "./utils";
+
+describe("cn utility function", () => {
+  it("merges class names correctly", () => {
+    const result = cn("foo", "bar");
+    expect(result).toBe("foo bar");
   });
 });
 ```
 
 #### Test komponentu React (button.test.tsx)
+
 ```typescript
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -112,6 +116,7 @@ npm run test:e2e:debug
 ### Konfiguracja
 
 Playwright jest skonfigurowany do:
+
 - Testowania tylko na **Chromium** (Desktop Chrome)
 - Automatycznego uruchamiania serwera deweloperskiego
 - Generowania trace dla nieudanych testów
@@ -121,27 +126,29 @@ Playwright jest skonfigurowany do:
 ### Przykłady testów
 
 #### Podstawowy test E2E (login.spec.ts)
-```typescript
-import { test, expect } from '@playwright/test';
 
-test.describe('Login Page', () => {
+```typescript
+import { test, expect } from "@playwright/test";
+
+test.describe("Login Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
+    await page.goto("/login");
   });
 
-  test('displays login form elements', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /witaj ponownie/i })).toBeVisible();
+  test("displays login form elements", async ({ page }) => {
+    await expect(page.getByRole("heading", { name: /witaj ponownie/i })).toBeVisible();
     await expect(page.getByLabel(/email/i)).toBeVisible();
   });
 });
 ```
 
 #### Test z Page Object Model (login-pom.spec.ts)
-```typescript
-import { test, expect } from '@playwright/test';
-import { LoginPage } from './pages/login.page';
 
-test.describe('Login Page - Using Page Object Model', () => {
+```typescript
+import { test, expect } from "@playwright/test";
+import { LoginPage } from "./pages/login.page";
+
+test.describe("Login Page - Using Page Object Model", () => {
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {
@@ -149,9 +156,9 @@ test.describe('Login Page - Using Page Object Model', () => {
     await loginPage.goto();
   });
 
-  test('can fill login form', async () => {
-    await loginPage.emailInput.fill('test@example.com');
-    await expect(loginPage.emailInput).toHaveValue('test@example.com');
+  test("can fill login form", async () => {
+    await loginPage.emailInput.fill("test@example.com");
+    await expect(loginPage.emailInput).toHaveValue("test@example.com");
   });
 });
 ```
@@ -170,6 +177,7 @@ test.describe('Login Page - Using Page Object Model', () => {
 ### src/test/setup.ts
 
 Ten plik zawiera globalną konfigurację dla testów Vitest:
+
 - Rozszerzenie expect o matchers z `@testing-library/jest-dom`
 - Automatyczne cleanup po każdym teście
 - Mock dla `window.matchMedia`
@@ -213,11 +221,13 @@ Testy można łatwo zintegrować z GitHub Actions lub innym CI/CD:
 ## Debugging
 
 ### Vitest
+
 - Użyj `test.only()` aby uruchomić tylko jeden test
 - Użyj `console.log()` w testach dla debugowania
 - Uruchom `npm run test:ui` dla interaktywnego debugowania
 
 ### Playwright
+
 - Użyj `npm run test:e2e:debug` dla step-by-step debugging
 - Użyj `await page.pause()` w teście dla zatrzymania wykonania
 - Otwórz HTML report: `npx playwright show-report`

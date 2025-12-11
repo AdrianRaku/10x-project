@@ -20,9 +20,7 @@ if (!tmdbApiKey) {
 }
 
 // Fetch movie details from TMDb API
-const movieResponse = await fetch(
-  `https://api.themoviedb.org/3/movie/${tmdb_id}?api_key=${tmdbApiKey}&language=pl-PL`
-);
+const movieResponse = await fetch(`https://api.themoviedb.org/3/movie/${tmdb_id}?api_key=${tmdbApiKey}&language=pl-PL`);
 
 if (!movieResponse.ok) {
   return Astro.redirect("/");
@@ -31,9 +29,7 @@ if (!movieResponse.ok) {
 const movie = await movieResponse.json();
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-const TMDB_BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/original";
 const posterUrl = movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : null;
-const backdropUrl = movie.backdrop_path ? `${TMDB_BACKDROP_BASE_URL}${movie.backdrop_path}` : null;
 const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : null;
 ---
 
@@ -41,9 +37,12 @@ const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYea
   <div class="h-screen bg-background overflow-hidden flex items-center justify-center px-8 py-8">
     <!-- Content -->
     <div class="flex gap-12 items-start max-w-5xl mx-auto">
-        <!-- Poster -->
-        <div class="w-[300px] h-[450px] flex-shrink-0 flex items-center justify-center border-2 border-border rounded-lg bg-card p-4">
-          {posterUrl ? (
+      <!-- Poster -->
+      <div
+        class="w-[300px] h-[450px] flex-shrink-0 flex items-center justify-center border-2 border-border rounded-lg bg-card p-4"
+      >
+        {
+          posterUrl ? (
             <img
               src={posterUrl}
               alt={`Plakat filmu ${movie.title}`}
@@ -53,68 +52,62 @@ const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYea
             <div class="flex w-full h-full items-center justify-center rounded-md bg-muted">
               <span class="text-sm text-muted-foreground">Brak plakatu</span>
             </div>
-          )}
-        </div>
+          )
+        }
+      </div>
 
-        <!-- Details -->
-        <div class="grid grid-rows-[1fr_auto] flex-1 max-w-2xl border-2 border-border rounded-lg bg-card p-8 h-[450px] gap-4">
-          <!-- Scrollable content area -->
-          <div class="space-y-6 overflow-y-auto min-h-0">
-            <div class="space-y-3">
-              <h1 class="text-4xl font-bold tracking-tight">
-                {movie.title}
-              </h1>
-              {movie.tagline && (
-                <p class="text-lg italic text-muted-foreground">
-                  {movie.tagline}
-                </p>
-              )}
-              <div class="flex flex-wrap gap-4 text-base text-muted-foreground">
-                {releaseYear && <span>{releaseYear}</span>}
-                {movie.runtime && <span>{movie.runtime} min</span>}
-                {movie.vote_average && (
-                  <span class="flex items-center gap-1">
-                    ⭐ {movie.vote_average.toFixed(1)}/10
-                  </span>
-                )}
-              </div>
+      <!-- Details -->
+      <div
+        class="grid grid-rows-[1fr_auto] flex-1 max-w-2xl border-2 border-border rounded-lg bg-card p-8 h-[450px] gap-4"
+      >
+        <!-- Scrollable content area -->
+        <div class="space-y-6 overflow-y-auto min-h-0">
+          <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">
+              {movie.title}
+            </h1>
+            {movie.tagline && <p class="text-lg italic text-muted-foreground">{movie.tagline}</p>}
+            <div class="flex flex-wrap gap-4 text-base text-muted-foreground">
+              {releaseYear && <span>{releaseYear}</span>}
+              {movie.runtime && <span>{movie.runtime} min</span>}
+              {movie.vote_average && <span class="flex items-center gap-1">⭐ {movie.vote_average.toFixed(1)}/10</span>}
             </div>
+          </div>
 
-            {movie.genres && movie.genres.length > 0 && (
+          {
+            movie.genres && movie.genres.length > 0 && (
               <div class="flex flex-wrap gap-2">
-                {movie.genres.map((genre: any) => (
-                  <span class="rounded-full bg-secondary px-3 py-1 text-sm font-medium">
-                    {genre.name}
-                  </span>
+                {movie.genres.map((genre: { id: number; name: string }) => (
+                  <span class="rounded-full bg-secondary px-3 py-1 text-sm font-medium">{genre.name}</span>
                 ))}
               </div>
-            )}
+            )
+          }
 
-            {movie.overview && (
+          {
+            movie.overview && (
               <div class="space-y-2">
                 <h2 class="text-xl font-semibold">Opis</h2>
-                <p class="leading-relaxed text-muted-foreground">
-                  {movie.overview}
-                </p>
+                <p class="leading-relaxed text-muted-foreground">{movie.overview}</p>
               </div>
-            )}
+            )
+          }
 
-            <!-- Action Buttons -->
-            <div class="flex flex-wrap gap-3 pt-4">
-              <MovieRating client:load tmdbId={Number(tmdb_id)} movieTitle={movie.title} />
-              <Button variant="outline">Dodaj do listy</Button>
-            </div>
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap gap-3 pt-4">
+            <MovieRating client:load tmdbId={Number(tmdb_id)} movieTitle={movie.title} />
+            <Button variant="outline">Dodaj do listy</Button>
           </div>
+        </div>
 
-          <!-- Back Button at bottom -->
-          <div class="pt-4 border-t border-border">
-            <Button variant="outline" size="sm" asChild>
-              <a href="/" class="flex items-center gap-2">
-                <ArrowLeft className="size-4" />
-                <span>Powrót do strony głównej</span>
-              </a>
-            </Button>
-          </div>
+        <!-- Back Button at bottom -->
+        <div class="pt-4 border-t border-border">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/" class="flex items-center gap-2">
+              <ArrowLeft className="size-4" />
+              <span>Powrót do strony głównej</span>
+            </a>
+          </Button>
         </div>
       </div>
     </div>

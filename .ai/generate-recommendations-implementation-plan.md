@@ -5,6 +5,7 @@
 Endpoint `/api/recommendations` generuje spersonalizowane rekomendacje filmów dla zalogowanego użytkownika na podstawie jego historii ocen (minimum 10 wymaganych) oraz opcjonalnego promptu tekstowego. System wykorzystuje OpenRouter AI (model Google Gemini Flash 1.5) do analizy preferencji użytkownika i zwraca listę 5 rekomendowanych filmów z danymi z TMDb API. Endpoint implementuje mechanizm kontroli dziennego limitu zapytań AI w celu optymalizacji kosztów i zapobiegania nadużyciom.
 
 **Główne funkcjonalności:**
+
 - Weryfikacja autentykacji użytkownika
 - Sprawdzenie minimum 10 ocen w historii
 - Kontrola dziennego limitu zapytań AI (domyślnie 10/dzień)
@@ -21,20 +22,26 @@ Endpoint `/api/recommendations` generuje spersonalizowane rekomendacje filmów d
 - **Content-Type**: `application/json`
 
 ### Parametry:
+
 - **Wymagane**: Brak (użytkownik musi być zalogowany - sprawdzane przez middleware/session)
-- **Opcjonalne**: 
+- **Opcjonalne**:
   - `prompt` (string, max 500 znaków) - Dodatkowy kontekst lub preferencje użytkownika, np. "Szukam czegoś w klimacie sci-fi z lat 80."
 
 ### Request Body Schema (Zod):
+
 ```typescript
 const GenerateRecommendationsSchema = z.object({
-  prompt: z.string().max(500, {
-    message: "Prompt cannot exceed 500 characters"
-  }).optional(),
+  prompt: z
+    .string()
+    .max(500, {
+      message: "Prompt cannot exceed 500 characters",
+    })
+    .optional(),
 });
 ```
 
 ### Przykład Request Body:
+
 ```json
 {
   "prompt": "I'm in the mood for a mind-bending sci-fi movie."
@@ -42,6 +49,7 @@ const GenerateRecommendationsSchema = z.object({
 ```
 
 Lub puste ciało żądania (brak promptu):
+
 ```json
 {}
 ```
@@ -51,6 +59,7 @@ Lub puste ciało żądania (brak promptu):
 ### Istniejące typy (z `src/types.ts`):
 
 **Command Model:**
+
 ```typescript
 export type GenerateRecommendationsCommand = {
   prompt?: string;
@@ -58,6 +67,7 @@ export type GenerateRecommendationsCommand = {
 ```
 
 **Response DTO:**
+
 ```typescript
 export type RecommendationDto = {
   tmdb_id: number;
@@ -69,6 +79,7 @@ export type RecommendationDto = {
 ### Dodatkowe typy wewnętrzne (dla serwisu):
 
 **Rating Entity (z bazy danych):**
+
 ```typescript
 type UserRatingHistory = {
   tmdb_id: number;
@@ -77,6 +88,7 @@ type UserRatingHistory = {
 ```
 
 **AI Response Schema (Zod - dla walidacji odpowiedzi z OpenRouter):**
+
 ```typescript
 const RecommendationSchema = z.object({
   tmdb_id: z.number().int().positive(),
@@ -90,6 +102,7 @@ const RecommendationsResponseSchema = z.object({
 ```
 
 **Struktura Response Wrapper:**
+
 ```typescript
 type RecommendationsResponse = {
   data: RecommendationDto[];
@@ -99,6 +112,7 @@ type RecommendationsResponse = {
 ## 4. Szczegóły odpowiedzi
 
 ### Success Response (200 OK):
+
 ```json
 {
   "data": [
@@ -114,6 +128,7 @@ type RecommendationsResponse = {
 ### Error Responses:
 
 **400 Bad Request** - Nieprawidłowe dane wejściowe:
+
 ```json
 {
   "error": "Bad Request",
@@ -127,6 +142,7 @@ type RecommendationsResponse = {
 ```
 
 **401 Unauthorized** - Brak autentykacji:
+
 ```json
 {
   "error": "Unauthorized",
@@ -135,6 +151,7 @@ type RecommendationsResponse = {
 ```
 
 **403 Forbidden** - Mniej niż 10 ocen:
+
 ```json
 {
   "error": "Forbidden",
@@ -147,6 +164,7 @@ type RecommendationsResponse = {
 ```
 
 **429 Too Many Requests** - Przekroczony dzienny limit:
+
 ```json
 {
   "error": "Too Many Requests",
@@ -160,6 +178,7 @@ type RecommendationsResponse = {
 ```
 
 **500 Internal Server Error** - Błąd AI lub serwera:
+
 ```json
 {
   "error": "Internal Server Error",
@@ -170,6 +189,7 @@ type RecommendationsResponse = {
 ## 5. Przepływ danych
 
 ### Diagram przepływu:
+
 ```
 Client (POST /api/recommendations)
     ↓
@@ -209,36 +229,41 @@ Client receives recommendations
 ### Szczegółowe interakcje z bazą danych:
 
 **Krok 3 - Sprawdzenie liczby ocen:**
+
 ```sql
 SELECT COUNT(*) FROM ratings WHERE user_id = $1;
 ```
 
 **Krok 4 - Sprawdzenie dziennego limitu:**
+
 ```sql
-SELECT COUNT(*) 
-FROM ai_recommendation_requests 
-WHERE user_id = $1 
-  AND created_at >= CURRENT_DATE 
+SELECT COUNT(*)
+FROM ai_recommendation_requests
+WHERE user_id = $1
+  AND created_at >= CURRENT_DATE
   AND created_at < CURRENT_DATE + INTERVAL '1 day';
 ```
 
 **Krok 5 - Pobranie historii ocen:**
+
 ```sql
-SELECT tmdb_id, rating 
-FROM ratings 
-WHERE user_id = $1 
+SELECT tmdb_id, rating
+FROM ratings
+WHERE user_id = $1
 ORDER BY created_at DESC;
 ```
 
 **Krok 9 - Logowanie zapytania:**
+
 ```sql
-INSERT INTO ai_recommendation_requests (user_id, created_at) 
+INSERT INTO ai_recommendation_requests (user_id, created_at)
 VALUES ($1, NOW());
 ```
 
 ### Interakcja z OpenRouter API:
 
 **Request do OpenRouter:**
+
 ```json
 {
   "model": "google/gemini-flash-1.5",
@@ -287,14 +312,15 @@ VALUES ($1, NOW());
 ## 6. Względy bezpieczeństwa
 
 ### Autentykacja i Autoryzacja:
+
 1. **Weryfikacja sesji użytkownika**:
+
    ```typescript
    const session = await locals.supabase.auth.getSession();
    if (!session.data.session) {
-     return new Response(
-       JSON.stringify({ error: "Unauthorized", message: "Authentication required" }),
-       { status: 401 }
-     );
+     return new Response(JSON.stringify({ error: "Unauthorized", message: "Authentication required" }), {
+       status: 401,
+     });
    }
    const userId = session.data.session.user.id;
    ```
@@ -304,10 +330,10 @@ VALUES ($1, NOW());
    - Użytkownik ma dostęp tylko do swoich danych
 
 ### Walidacja danych wejściowych:
+
 1. **Schemat Zod dla promptu**:
    - Maksymalna długość: 500 znaków (ochrona przed nadmiernym zużyciem tokenów AI)
    - Opcjonalność: prompt może być pominięty
-   
 2. **Sanityzacja promptu** (w RecommendationsService):
    ```typescript
    private sanitizePrompt(prompt?: string): string | undefined {
@@ -320,26 +346,29 @@ VALUES ($1, NOW());
    ```
 
 ### Rate Limiting:
+
 1. **Dzienny limit zapytań AI**:
    - Domyślnie: 10 zapytań na użytkownika dziennie
    - Konfigurowalny przez zmienną środowiskową: `DAILY_RECOMMENDATION_LIMIT`
    - Reset o północy UTC
 
 2. **Implementacja**:
+
    ```typescript
-   const DAILY_LIMIT = parseInt(import.meta.env.DAILY_RECOMMENDATION_LIMIT || '10');
-   
+   const DAILY_LIMIT = parseInt(import.meta.env.DAILY_RECOMMENDATION_LIMIT || "10");
+
    const { count } = await supabase
-     .from('ai_recommendation_requests')
-     .select('*', { count: 'exact', head: true })
-     .gte('created_at', new Date().setHours(0, 0, 0, 0));
-   
+     .from("ai_recommendation_requests")
+     .select("*", { count: "exact", head: true })
+     .gte("created_at", new Date().setHours(0, 0, 0, 0));
+
    if (count >= DAILY_LIMIT) {
      throw new TooManyRequestsError();
    }
    ```
 
 ### Ochrona przed Prompt Injection:
+
 1. **Struktura promptu systemowego**:
    - Wyraźne oddzielenie danych użytkownika od instrukcji systemowych
    - Użycie JSON Schema dla wymuszonego formatu odpowiedzi
@@ -349,11 +378,13 @@ VALUES ($1, NOW());
    - Odrzucenie odpowiedzi niezgodnych ze schematem
 
 ### Ochrona kluczy API:
+
 1. **Przechowywanie w zmiennych środowiskowych**:
+
    ```typescript
    const apiKey = import.meta.env.OPENROUTER_API_KEY;
    if (!apiKey) {
-     throw new Error('OPENROUTER_API_KEY not configured');
+     throw new Error("OPENROUTER_API_KEY not configured");
    }
    ```
 
@@ -362,12 +393,14 @@ VALUES ($1, NOW());
    - Endpoint API działa wyłącznie server-side (SSR)
 
 ### Logowanie i Monitoring:
+
 1. **Logowanie błędów**:
+
    ```typescript
-   console.error('[recommendations] Error details:', {
+   console.error("[recommendations] Error details:", {
      userId,
-     error: error instanceof Error ? error.message : 'Unknown error',
-     timestamp: new Date().toISOString()
+     error: error instanceof Error ? error.message : "Unknown error",
+     timestamp: new Date().toISOString(),
    });
    ```
 
@@ -380,15 +413,17 @@ VALUES ($1, NOW());
 ### Hierarchia błędów:
 
 #### 1. Błędy walidacji (400 Bad Request):
+
 **Scenariusz**: Nieprawidłowy format JSON lub niezgodność ze schematem Zod
+
 ```typescript
 try {
   const body = await request.json();
 } catch {
   return new Response(
-    JSON.stringify({ 
-      error: "Bad Request", 
-      message: "Invalid JSON in request body" 
+    JSON.stringify({
+      error: "Bad Request",
+      message: "Invalid JSON in request body",
     }),
     { status: 400, headers: { "Content-Type": "application/json" } }
   );
@@ -400,7 +435,7 @@ if (!validation.success) {
     JSON.stringify({
       error: "Bad Request",
       message: "Invalid request data",
-      details: validation.error.flatten()
+      details: validation.error.flatten(),
     }),
     { status: 400, headers: { "Content-Type": "application/json" } }
   );
@@ -408,14 +443,16 @@ if (!validation.success) {
 ```
 
 #### 2. Błędy autentykacji (401 Unauthorized):
+
 **Scenariusz**: Brak sesji użytkownika
+
 ```typescript
 const session = await locals.supabase.auth.getSession();
 if (!session.data.session) {
   return new Response(
-    JSON.stringify({ 
-      error: "Unauthorized", 
-      message: "Authentication required" 
+    JSON.stringify({
+      error: "Unauthorized",
+      message: "Authentication required",
     }),
     { status: 401, headers: { "Content-Type": "application/json" } }
   );
@@ -423,14 +460,19 @@ if (!session.data.session) {
 ```
 
 #### 3. Błędy biznesowe (403 Forbidden):
+
 **Scenariusz**: Użytkownik ma mniej niż 10 ocen
 
 W RecommendationsService:
+
 ```typescript
 class InsufficientRatingsError extends Error {
-  constructor(public currentCount: number, public requiredCount: number = 10) {
+  constructor(
+    public currentCount: number,
+    public requiredCount: number = 10
+  ) {
     super(`User has only ${currentCount} ratings, minimum ${requiredCount} required`);
-    this.name = 'InsufficientRatingsError';
+    this.name = "InsufficientRatingsError";
   }
 }
 
@@ -442,6 +484,7 @@ if (ratingsCount < 10) {
 ```
 
 W endpoincie:
+
 ```typescript
 catch (error) {
   if (error instanceof InsufficientRatingsError) {
@@ -461,9 +504,11 @@ catch (error) {
 ```
 
 #### 4. Błędy rate limiting (429 Too Many Requests):
+
 **Scenariusz**: Przekroczony dzienny limit zapytań
 
 W RecommendationsService:
+
 ```typescript
 class DailyLimitExceededError extends Error {
   constructor(
@@ -472,7 +517,7 @@ class DailyLimitExceededError extends Error {
     public resetTime: Date
   ) {
     super(`Daily limit of ${dailyLimit} requests exceeded`);
-    this.name = 'DailyLimitExceededError';
+    this.name = "DailyLimitExceededError";
   }
 }
 
@@ -486,6 +531,7 @@ if (requestsToday >= dailyLimit) {
 ```
 
 W endpoincie:
+
 ```typescript
 catch (error) {
   if (error instanceof DailyLimitExceededError) {
@@ -506,53 +552,57 @@ catch (error) {
 ```
 
 #### 5. Błędy zewnętrznych serwisów (500 Internal Server Error):
+
 **Scenariusz A**: Błąd komunikacji z OpenRouter API
+
 ```typescript
 class OpenRouterError extends Error {
-  constructor(message: string, public statusCode?: number) {
+  constructor(
+    message: string,
+    public statusCode?: number
+  ) {
     super(message);
-    this.name = 'OpenRouterError';
+    this.name = "OpenRouterError";
   }
 }
 
 // W OpenRouterService (już obsłużone):
 if (!response.ok) {
-  throw new OpenRouterError(
-    `OpenRouter API error: ${response.status}`,
-    response.status
-  );
+  throw new OpenRouterError(`OpenRouter API error: ${response.status}`, response.status);
 }
 ```
 
 **Scenariusz B**: Błąd parsowania odpowiedzi AI
+
 ```typescript
 class AIResponseParsingError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'AIResponseParsingError';
+    this.name = "AIResponseParsingError";
   }
 }
 
 // W RecommendationsService:
 const content = aiResponse.choices[0]?.message?.content;
 if (!content) {
-  throw new AIResponseParsingError('Empty response from AI');
+  throw new AIResponseParsingError("Empty response from AI");
 }
 
 let parsedContent;
 try {
   parsedContent = JSON.parse(content);
 } catch {
-  throw new AIResponseParsingError('Invalid JSON in AI response');
+  throw new AIResponseParsingError("Invalid JSON in AI response");
 }
 
 const validation = RecommendationsResponseSchema.safeParse(parsedContent);
 if (!validation.success) {
-  throw new AIResponseParsingError('AI response does not match expected schema');
+  throw new AIResponseParsingError("AI response does not match expected schema");
 }
 ```
 
 **Scenariusz C**: Błędy bazy danych
+
 ```typescript
 // Supabase automatycznie rzuca błędy, łapiemy je w endpoincie:
 catch (error) {
@@ -568,6 +618,7 @@ catch (error) {
 ```
 
 #### 6. Obsługa wszystkich nieoczekiwanych błędów:
+
 ```typescript
 catch (error) {
   // Logowanie szczegółowe dla debugowania
@@ -590,6 +641,7 @@ catch (error) {
 ```
 
 ### Strategia obsługi błędów w serwisie:
+
 - **Rzucanie typowanych błędów**: Własne klasy błędów dla różnych scenariuszy
 - **Early returns**: Sprawdzanie warunków na początku metod
 - **Propagacja błędów**: Pozwalanie błędom wypłynąć do endpointu dla scentralizowanej obsługi
@@ -600,22 +652,21 @@ catch (error) {
 ### Potencjalne wąskie gardła:
 
 #### 1. Zapytania do bazy danych:
+
 **Problem**: Trzy oddzielne zapytania do Supabase (liczba ocen, limit dzienny, historia ocen)
 
 **Optymalizacja**:
+
 ```typescript
 // Zamiast 3 osobnych zapytań, użyj jednego zapytania z wieloma operacjami
 const [ratingsData, requestsCount] = await Promise.all([
+  supabase.from("ratings").select("tmdb_id, rating").eq("user_id", userId),
+
   supabase
-    .from('ratings')
-    .select('tmdb_id, rating')
-    .eq('user_id', userId),
-  
-  supabase
-    .from('ai_recommendation_requests')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('created_at', new Date().setHours(0, 0, 0, 0))
+    .from("ai_recommendation_requests")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", new Date().setHours(0, 0, 0, 0)),
 ]);
 
 // Liczba ocen to po prostu długość tablicy
@@ -625,19 +676,22 @@ const ratingsCount = ratingsData.data?.length || 0;
 **Oczekiwany czas odpowiedzi**: 50-150ms (przy dobrym połączeniu z Supabase)
 
 #### 2. Wywołanie OpenRouter API:
+
 **Problem**: Największe opóźnienie (2-10 sekund w zależności od modelu i obciążenia)
 
 **Optymalizacje**:
+
 - Użycie szybkiego modelu: `google/gemini-flash-1.5` (już uwzględnione)
 - Ograniczenie `max_tokens` do rozsądnej wartości (1000)
 - Timeout dla zapytania AI:
+
   ```typescript
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-  
+
   try {
     const aiResponse = await openRouterService.generateChatCompletion(request, {
-      signal: controller.signal
+      signal: controller.signal,
     });
   } finally {
     clearTimeout(timeoutId);
@@ -647,35 +701,41 @@ const ratingsCount = ratingsData.data?.length || 0;
 **Oczekiwany czas odpowiedzi**: 2-8 sekund
 
 #### 3. Parsowanie i walidacja JSON:
+
 **Problem**: Walidacja Zod może być kosztowna dla dużych obiektów
 
 **Optymalizacja**:
+
 - Schemat Zod jest prosty (tylko 5 obiektów w tablicy)
 - Używamy `.safeParse()` zamiast `.parse()` dla lepszej kontroli błędów
 
 **Oczekiwany czas**: < 5ms
 
 ### Całkowity oczekiwany czas odpowiedzi:
+
 - **Optimistic case**: 2-3 sekundy
 - **Typical case**: 3-6 sekund
 - **Worst case**: 8-15 sekund (z timeoutem)
 
 ### Strategie cache'owania:
+
 **Nie zalecane** dla tego endpointu, ponieważ:
+
 - Rekomendacje mają być świeże i mogą się zmieniać
 - Użytkownik może użyć różnych promptów
 - Historia ocen może się zmieniać między zapytaniami
 
 ### Monitoring wydajności:
+
 ```typescript
 const startTime = Date.now();
 
 try {
   // ... implementacja endpointu
-  
+
   const duration = Date.now() - startTime;
   console.log(`[recommendations] Request completed in ${duration}ms`);
-  
+
   // Opcjonalnie: wysyłanie metryk do systemu monitoringu
   if (duration > 10000) {
     console.warn(`[recommendations] Slow request detected: ${duration}ms`);
@@ -687,28 +747,36 @@ try {
 ```
 
 ### Optymalizacja kosztów AI:
+
 1. **Dzienny limit**: Zapobiega nadmiernemu zużyciu API (10 zapytań/użytkownik/dzień)
 2. **Ograniczenie długości promptu**: Max 500 znaków
 3. **Ograniczenie max_tokens**: 1000 tokenów (wystarczające dla 5 rekomendacji)
 4. **Użycie taniego modelu**: Gemini Flash 1.5 jest znacznie tańszy niż GPT-4
 
 ### Database indexing:
+
 Już zaimplementowane w migracjach:
+
 - `ai_recommendation_requests_user_id_created_at_idx` - dla sprawdzania dziennego limitu
 - `ratings_user_id_idx` - dla pobierania historii ocen
 
 ## 9. Etapy wdrożenia
 
 ### Krok 1: Utworzenie klas błędów dla serwisu
+
 **Plik**: `src/lib/services/recommendations.service.ts` (nowy plik)
 
 Zdefiniuj własne klasy błędów:
+
 ```typescript
 // Custom error classes
 export class InsufficientRatingsError extends Error {
-  constructor(public currentCount: number, public requiredCount: number = 10) {
+  constructor(
+    public currentCount: number,
+    public requiredCount: number = 10
+  ) {
     super(`User has only ${currentCount} ratings, minimum ${requiredCount} required`);
-    this.name = 'InsufficientRatingsError';
+    this.name = "InsufficientRatingsError";
   }
 }
 
@@ -719,28 +787,29 @@ export class DailyLimitExceededError extends Error {
     public resetTime: Date
   ) {
     super(`Daily limit of ${dailyLimit} requests exceeded`);
-    this.name = 'DailyLimitExceededError';
+    this.name = "DailyLimitExceededError";
   }
 }
 
 export class AIResponseParsingError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'AIResponseParsingError';
+    this.name = "AIResponseParsingError";
   }
 }
 ```
 
 ### Krok 2: Implementacja RecommendationsService
+
 **Plik**: `src/lib/services/recommendations.service.ts`
 
 Utwórz klasę serwisu z następującymi metodami:
 
 ```typescript
-import { z } from 'zod';
-import type { SupabaseClient } from '../../db/supabase.client';
-import type { RecommendationDto } from '../../types';
-import { OpenRouterService } from './openrouter.service';
+import { z } from "zod";
+import type { SupabaseClient } from "../../db/supabase.client";
+import type { RecommendationDto } from "../../types";
+import { OpenRouterService } from "./openrouter.service";
 
 // Schematy walidacji
 const RecommendationSchema = z.object({
@@ -794,11 +863,7 @@ export class RecommendationsService {
     }
 
     // 4. Generuj rekomendacje przez AI
-    const recommendations = await this.callAIForRecommendations(
-      ratingsData,
-      prompt,
-      openRouterApiKey
-    );
+    const recommendations = await this.callAIForRecommendations(ratingsData, prompt, openRouterApiKey);
 
     // 5. Zaloguj zapytanie
     await this.logRecommendationRequest(userId, supabase);
@@ -809,15 +874,12 @@ export class RecommendationsService {
   /**
    * Pobiera historię ocen użytkownika
    */
-  private async getUserRatings(
-    userId: string,
-    supabase: SupabaseClient
-  ): Promise<UserRating[]> {
+  private async getUserRatings(userId: string, supabase: SupabaseClient): Promise<UserRating[]> {
     const { data, error } = await supabase
-      .from('ratings')
-      .select('tmdb_id, rating')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("ratings")
+      .select("tmdb_id, rating")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw error;
@@ -829,18 +891,15 @@ export class RecommendationsService {
   /**
    * Sprawdza liczbę zapytań dzisiaj
    */
-  private async getRequestsCountToday(
-    userId: string,
-    supabase: SupabaseClient
-  ): Promise<number> {
+  private async getRequestsCountToday(userId: string, supabase: SupabaseClient): Promise<number> {
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
 
     const { count, error } = await supabase
-      .from('ai_recommendation_requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .gte('created_at', todayStart.toISOString());
+      .from("ai_recommendation_requests")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", todayStart.toISOString());
 
     if (error) {
       throw error;
@@ -864,37 +923,37 @@ export class RecommendationsService {
 
     // Schemat JSON dla odpowiedzi
     const responseSchema = {
-      type: 'object',
+      type: "object",
       properties: {
         recommendations: {
-          type: 'array',
+          type: "array",
           items: {
-            type: 'object',
+            type: "object",
             properties: {
-              tmdb_id: { type: 'number', description: 'TMDb movie ID' },
-              title: { type: 'string', description: 'Movie title' },
-              year: { type: 'number', description: 'Release year' },
+              tmdb_id: { type: "number", description: "TMDb movie ID" },
+              title: { type: "string", description: "Movie title" },
+              year: { type: "number", description: "Release year" },
             },
-            required: ['tmdb_id', 'title', 'year'],
+            required: ["tmdb_id", "title", "year"],
           },
           minItems: 5,
           maxItems: 5,
         },
       },
-      required: ['recommendations'],
+      required: ["recommendations"],
     };
 
     // Wywołanie OpenRouter
     const aiResponse = await openRouterService.generateChatCompletion({
-      model: 'google/gemini-flash-1.5',
+      model: "google/gemini-flash-1.5",
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt || 'Suggest 5 great movies for me.' },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt || "Suggest 5 great movies for me." },
       ],
       response_format: {
-        type: 'json_schema',
+        type: "json_schema",
         json_schema: {
-          name: 'movie_recommendations',
+          name: "movie_recommendations",
           strict: true,
           schema: responseSchema,
         },
@@ -906,21 +965,19 @@ export class RecommendationsService {
     // Parsowanie odpowiedzi
     const content = aiResponse.choices[0]?.message?.content;
     if (!content) {
-      throw new AIResponseParsingError('Empty response from AI');
+      throw new AIResponseParsingError("Empty response from AI");
     }
 
     let parsedContent;
     try {
       parsedContent = JSON.parse(content);
     } catch {
-      throw new AIResponseParsingError('Invalid JSON in AI response');
+      throw new AIResponseParsingError("Invalid JSON in AI response");
     }
 
     const validation = RecommendationsResponseSchema.safeParse(parsedContent);
     if (!validation.success) {
-      throw new AIResponseParsingError(
-        `AI response validation failed: ${validation.error.message}`
-      );
+      throw new AIResponseParsingError(`AI response validation failed: ${validation.error.message}`);
     }
 
     return validation.data.recommendations;
@@ -930,9 +987,7 @@ export class RecommendationsService {
    * Buduje prompt systemowy z historią ocen
    */
   private buildSystemPrompt(ratings: UserRating[]): string {
-    const ratingsText = ratings
-      .map((r) => `- TMDb ID ${r.tmdb_id}: Rating ${r.rating}/10`)
-      .join('\n');
+    const ratingsText = ratings.map((r) => `- TMDb ID ${r.tmdb_id}: Rating ${r.rating}/10`).join("\n");
 
     return `You are an expert movie recommendation system. Based on the user's rating history below, suggest 5 movies they would love. 
 
@@ -950,17 +1005,12 @@ Provide 5 diverse movie recommendations with valid TMDb IDs, titles, and release
   /**
    * Loguje zapytanie do bazy danych
    */
-  private async logRecommendationRequest(
-    userId: string,
-    supabase: SupabaseClient
-  ): Promise<void> {
-    const { error } = await supabase
-      .from('ai_recommendation_requests')
-      .insert({ user_id: userId });
+  private async logRecommendationRequest(userId: string, supabase: SupabaseClient): Promise<void> {
+    const { error } = await supabase.from("ai_recommendation_requests").insert({ user_id: userId });
 
     if (error) {
       // Loguj błąd, ale nie rzucaj - nie chcemy psuć response jeśli logowanie się nie powiodło
-      console.error('[recommendations] Failed to log request:', error);
+      console.error("[recommendations] Failed to log request:", error);
     }
   }
 
@@ -969,24 +1019,25 @@ Provide 5 diverse movie recommendations with valid TMDb IDs, titles, and release
    */
   private sanitizePrompt(prompt?: string): string | undefined {
     if (!prompt) return undefined;
-    return prompt.replace(/[<>]/g, '').trim();
+    return prompt.replace(/[<>]/g, "").trim();
   }
 }
 ```
 
 ### Krok 3: Utworzenie endpointu API
+
 **Plik**: `src/pages/api/recommendations.ts` (nowy plik)
 
 ```typescript
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import type { RecommendationDto } from '../../types';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import type { RecommendationDto } from "../../types";
 import {
   RecommendationsService,
   InsufficientRatingsError,
   DailyLimitExceededError,
   AIResponseParsingError,
-} from '../../lib/services/recommendations.service';
+} from "../../lib/services/recommendations.service";
 
 export const prerender = false;
 
@@ -997,7 +1048,7 @@ const GenerateRecommendationsSchema = z.object({
   prompt: z
     .string()
     .max(500, {
-      message: 'Prompt cannot exceed 500 characters',
+      message: "Prompt cannot exceed 500 characters",
     })
     .optional(),
 });
@@ -1017,12 +1068,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     } catch {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Invalid JSON in request body',
+          error: "Bad Request",
+          message: "Invalid JSON in request body",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -1032,13 +1083,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!validation.success) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Invalid request data',
+          error: "Bad Request",
+          message: "Invalid request data",
           details: validation.error.flatten(),
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -1048,12 +1099,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!session.data.session) {
       return new Response(
         JSON.stringify({
-          error: 'Unauthorized',
-          message: 'Authentication required',
+          error: "Unauthorized",
+          message: "Authentication required",
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -1063,30 +1114,29 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // 4. Sprawdzenie konfiguracji API key
     const openRouterApiKey = import.meta.env.OPENROUTER_API_KEY;
     if (!openRouterApiKey) {
-      console.error('[recommendations] OPENROUTER_API_KEY not configured');
+      console.error("[recommendations] OPENROUTER_API_KEY not configured");
       return new Response(
         JSON.stringify({
-          error: 'Internal Server Error',
-          message: 'Service temporarily unavailable',
+          error: "Internal Server Error",
+          message: "Service temporarily unavailable",
         }),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // 5. Generowanie rekomendacji przez serwis
-    const dailyLimit = parseInt(import.meta.env.DAILY_RECOMMENDATION_LIMIT || '10');
+    const dailyLimit = parseInt(import.meta.env.DAILY_RECOMMENDATION_LIMIT || "10");
     const recommendationsService = new RecommendationsService(dailyLimit);
 
-    const recommendations: RecommendationDto[] =
-      await recommendationsService.generateRecommendations(
-        userId,
-        validation.data.prompt,
-        locals.supabase,
-        openRouterApiKey
-      );
+    const recommendations: RecommendationDto[] = await recommendationsService.generateRecommendations(
+      userId,
+      validation.data.prompt,
+      locals.supabase,
+      openRouterApiKey
+    );
 
     // 6. Sukces - zwróć rekomendacje
     const duration = Date.now() - startTime;
@@ -1098,7 +1148,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   } catch (error) {
@@ -1109,8 +1159,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       console.log(`[recommendations] Insufficient ratings after ${duration}ms`);
       return new Response(
         JSON.stringify({
-          error: 'Forbidden',
-          message: 'You must have at least 10 rated movies to generate recommendations',
+          error: "Forbidden",
+          message: "You must have at least 10 rated movies to generate recommendations",
           details: {
             currentRatingsCount: error.currentCount,
             requiredRatingsCount: error.requiredCount,
@@ -1118,7 +1168,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }),
         {
           status: 403,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -1127,8 +1177,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       console.log(`[recommendations] Daily limit exceeded after ${duration}ms`);
       return new Response(
         JSON.stringify({
-          error: 'Too Many Requests',
-          message: 'Daily recommendation limit exceeded. Please try again tomorrow.',
+          error: "Too Many Requests",
+          message: "Daily recommendation limit exceeded. Please try again tomorrow.",
           details: {
             dailyLimit: error.dailyLimit,
             requestsToday: error.requestsToday,
@@ -1137,7 +1187,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }),
         {
           status: 429,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -1146,30 +1196,30 @@ export const POST: APIRoute = async ({ request, locals }) => {
       console.error(`[recommendations] AI parsing error after ${duration}ms:`, error.message);
       return new Response(
         JSON.stringify({
-          error: 'Internal Server Error',
-          message: 'Failed to process AI response. Please try again.',
+          error: "Internal Server Error",
+          message: "Failed to process AI response. Please try again.",
         }),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // Obsługa nieznanych błędów
     console.error(`[recommendations] Unexpected error after ${duration}ms:`, {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
     });
 
     return new Response(
       JSON.stringify({
-        error: 'Internal Server Error',
-        message: 'Failed to generate recommendations. Please try again later.',
+        error: "Internal Server Error",
+        message: "Failed to generate recommendations. Please try again later.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
@@ -1177,6 +1227,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 ```
 
 ### Krok 4: Dodanie zmiennych środowiskowych
+
 **Plik**: `.env` (dodaj jeśli nie istnieje)
 
 ```bash
@@ -1188,13 +1239,16 @@ DAILY_RECOMMENDATION_LIMIT=10
 ```
 
 **Plik**: `.env.example` (dodaj dla dokumentacji)
+
 ```bash
 OPENROUTER_API_KEY=your_openrouter_api_key_here
 DAILY_RECOMMENDATION_LIMIT=10
 ```
 
 ### Krok 5: Walidacja TypeScript
+
 Uruchom TypeScript compiler w trybie sprawdzania:
+
 ```bash
 npx tsc --noEmit
 ```
@@ -1204,6 +1258,7 @@ Upewnij się, że nie ma błędów typowania.
 ### Krok 6: Testowanie endpointu
 
 **Test 1: Sukces (użytkownik z 10+ ocenami)**
+
 ```bash
 curl -X POST http://localhost:4321/api/recommendations \
   -H "Content-Type: application/json" \
@@ -1214,6 +1269,7 @@ curl -X POST http://localhost:4321/api/recommendations \
 Oczekiwany wynik: 200 OK z listą 5 rekomendacji
 
 **Test 2: Brak autentykacji**
+
 ```bash
 curl -X POST http://localhost:4321/api/recommendations \
   -H "Content-Type: application/json" \
@@ -1233,6 +1289,7 @@ Oczekiwany wynik: 403 Forbidden z informacją o braku wystarczającej liczby oce
 Oczekiwany wynik: 429 Too Many Requests
 
 **Test 5: Nieprawidłowy prompt**
+
 ```bash
 curl -X POST http://localhost:4321/api/recommendations \
   -H "Content-Type: application/json" \
@@ -1243,25 +1300,30 @@ curl -X POST http://localhost:4321/api/recommendations \
 Oczekiwany wynik: 400 Bad Request (prompt za długi)
 
 ### Krok 7: Monitorowanie i logowanie
+
 Dodaj opcjonalne logowanie do zewnętrznego systemu monitoringu (np. Sentry, LogRocket) w późniejszej fazie.
 
 ### Krok 8: Dokumentacja API
+
 Zaktualizuj dokumentację API (README.md lub dedykowany plik docs) z:
+
 - Przykładami użycia
 - Kodami błędów
 - Limitami i ograniczeniami
 - Wymaganiami autentykacji
 
 ### Krok 9: Testy integracyjne (opcjonalne, ale zalecane)
+
 Utwórz testy integracyjne w frameworku jak Vitest lub Jest:
 
 **Plik**: `src/lib/services/recommendations.service.test.ts`
-```typescript
-import { describe, it, expect, vi } from 'vitest';
-import { RecommendationsService, InsufficientRatingsError } from './recommendations.service';
 
-describe('RecommendationsService', () => {
-  it('should throw InsufficientRatingsError when user has less than 10 ratings', async () => {
+```typescript
+import { describe, it, expect, vi } from "vitest";
+import { RecommendationsService, InsufficientRatingsError } from "./recommendations.service";
+
+describe("RecommendationsService", () => {
+  it("should throw InsufficientRatingsError when user has less than 10 ratings", async () => {
     // Mock Supabase client
     const mockSupabase = {
       from: vi.fn().mockReturnValue({
@@ -1276,14 +1338,9 @@ describe('RecommendationsService', () => {
 
     const service = new RecommendationsService(10);
 
-    await expect(
-      service.generateRecommendations(
-        'user-id',
-        undefined,
-        mockSupabase as any,
-        'api-key'
-      )
-    ).rejects.toThrow(InsufficientRatingsError);
+    await expect(service.generateRecommendations("user-id", undefined, mockSupabase as any, "api-key")).rejects.toThrow(
+      InsufficientRatingsError
+    );
   });
 
   // Więcej testów...
@@ -1291,6 +1348,7 @@ describe('RecommendationsService', () => {
 ```
 
 ### Krok 10: Deployment
+
 1. Upewnij się, że zmienne środowiskowe są ustawione w środowisku produkcyjnym (DigitalOcean)
 2. Deploy przez GitHub Actions
 3. Zweryfikuj działanie na produkcji przez wywołanie endpointu
@@ -1300,6 +1358,7 @@ describe('RecommendationsService', () => {
 ## Podsumowanie
 
 Ten plan implementacji zapewnia:
+
 - ✅ Pełną walidację danych wejściowych i wyjściowych
 - ✅ Solidną obsługę błędów z czytelnymi komunikatami
 - ✅ Bezpieczeństwo przez autentykację, RLS i rate limiting
@@ -1310,4 +1369,3 @@ Ten plan implementacji zapewnia:
 - ✅ Dokumentację i przykłady użycia
 
 Endpoint jest gotowy do implementacji zgodnie z najlepszymi praktykami dla aplikacji produkcyjnych.
-

@@ -1,4 +1,4 @@
-# MyFilms
+# MyFilms :)
 
 [![Project Status: In Development](https://img.shields.io/badge/status-in_development-yellowgreen.svg)](https://shields.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)

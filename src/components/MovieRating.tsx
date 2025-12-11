@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Star } from "lucide-react";
+import type { RatingDto } from "@/types";
 
 interface MovieRatingProps {
   tmdbId: number;
@@ -31,7 +32,7 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
         const response = await fetch("/api/ratings");
         if (response.ok) {
           const { data } = await response.json();
-          const existingRating = data.find((r: any) => r.tmdb_id === tmdbId);
+          const existingRating = data.find((r: RatingDto) => r.tmdb_id === tmdbId);
           if (existingRating) {
             setCurrentRating(existingRating.rating);
             setSelectedRating(existingRating.rating);
@@ -103,7 +104,7 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
       <DialogContent className="sm:max-w-[425px]" data-test-id="rating-dialog">
         <DialogHeader>
           <DialogTitle>Oceń film</DialogTitle>
-          <DialogDescription>Jak oceniasz "{movieTitle}"? Wybierz ocenę od 1 do 10.</DialogDescription>
+          <DialogDescription>Jak oceniasz &ldquo;{movieTitle}&rdquo;? Wybierz ocenę od 1 do 10.</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <div className="flex justify-center gap-1" data-test-id="rating-stars-container">
@@ -139,13 +140,21 @@ export function MovieRating({ tmdbId, movieTitle }: MovieRatingProps) {
               Wybrana ocena: <span className="font-semibold text-foreground">{selectedRating}/10</span>
             </p>
           )}
-          {error && <p className="mt-4 text-center text-sm text-destructive" data-test-id="rating-error">{error}</p>}
+          {error && (
+            <p className="mt-4 text-center text-sm text-destructive" data-test-id="rating-error">
+              {error}
+            </p>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleCancel} disabled={isLoading} data-test-id="rating-cancel-button">
             Anuluj
           </Button>
-          <Button onClick={handleSubmit} disabled={isLoading || selectedRating === null} data-test-id="rating-submit-button">
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading || selectedRating === null}
+            data-test-id="rating-submit-button"
+          >
             {isLoading ? "Zapisywanie..." : "Zapisz ocenę"}
           </Button>
         </DialogFooter>

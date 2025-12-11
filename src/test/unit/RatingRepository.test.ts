@@ -1,8 +1,8 @@
-
 import { RatingRepository } from "../../lib/repositories/RatingRepository";
 import type { SupabaseClient } from "../../db/supabase.client";
 
 describe("RatingRepository", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockSupabase: any;
   let repository: RatingRepository;
 

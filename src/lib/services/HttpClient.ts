@@ -10,9 +10,7 @@ export class HttpClient {
     try {
       response = await fetch(url);
     } catch (error) {
-      throw new Error(
-        `Failed to connect: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      throw new Error(`Failed to connect: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
 
     if (!response.ok) {
@@ -22,10 +20,7 @@ export class HttpClient {
     try {
       return await response.json();
     } catch (error) {
-      throw new Error(
-        `Failed to parse response: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      throw new Error(`Failed to parse response: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 }
-

@@ -13,9 +13,7 @@ export class RecommendationRequestRepository {
    * @param userId - The user ID making the request
    */
   async logRequest(userId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from("ai_recommendation_requests")
-      .insert({ user_id: userId });
+    const { error } = await this.supabase.from("ai_recommendation_requests").insert({ user_id: userId });
 
     if (error) {
       throw new Error(`Failed to log recommendation request: ${error.message}`);

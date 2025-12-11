@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { email, password } = result.data;
 
     // Attempt to sign up with Supabase
-    const { data, error } = await locals.supabase.auth.signUp({
+    const { error } = await locals.supabase.auth.signUp({
       email,
       password,
     });
@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }),
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return new Response(
       JSON.stringify({
         message: "Wystąpił błąd podczas rejestracji",

@@ -1,6 +1,6 @@
-import { test as base } from '@playwright/test';
-import { cleanupUserDataByEmail } from '../helpers/cleanup';
-import { getTestCredentials } from '../helpers/test-credentials';
+import { test as base } from "@playwright/test";
+import { cleanupUserDataByEmail } from "../helpers/cleanup";
+import { getTestCredentials } from "../helpers/test-credentials";
 
 /**
  * Extended test fixture that cleans up user data before each test
@@ -11,6 +11,7 @@ export const test = base.extend({
    * Auto fixture that runs before each test to clean up test user data
    */
   cleanDatabase: [
+    // eslint-disable-next-line no-empty-pattern
     async ({}, use) => {
       const credentials = getTestCredentials();
 
@@ -32,4 +33,4 @@ export const test = base.extend({
   ],
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";

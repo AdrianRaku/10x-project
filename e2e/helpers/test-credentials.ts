@@ -8,9 +8,7 @@ export function getTestCredentials() {
   const password = process.env.E2E_PASSWORD;
 
   if (!username || !password) {
-    throw new Error(
-      'E2E_USERNAME and E2E_PASSWORD must be set in .env.test file'
-    );
+    throw new Error("E2E_USERNAME and E2E_PASSWORD must be set in .env.test file");
   }
 
   return {

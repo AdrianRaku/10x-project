@@ -50,7 +50,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }),
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return new Response(
       JSON.stringify({
         message: "Wystąpił błąd podczas logowania",

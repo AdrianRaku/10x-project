@@ -14,7 +14,7 @@ export class RatingRepository {
   constructor(private supabase: SupabaseClient) {}
   /**
    * Retrieves user's rating history from the database.
-   * 
+   *
    * @param userId - The authenticated user's ID
    * @returns Array of user's ratings ordered by creation date (newest first)
    */
@@ -31,7 +31,7 @@ export class RatingRepository {
   }
   /**
    * Counts how many ratings a user has.
-   * 
+   *
    * @param userId - The authenticated user's ID
    * @returns Number of ratings the user has
    */

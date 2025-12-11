@@ -2,9 +2,7 @@
  * Result type for functional error handling.
  * Implements Result Pattern for better error handling without exceptions.
  */
-export type Result<T, E = Error> =
-  | { success: true; value: T }
-  | { success: false; error: E };
+export type Result<T, E = Error> = { success: true; value: T } | { success: false; error: E };
 
 /**
  * Helper functions for working with Results.
@@ -47,10 +45,7 @@ export const Result = {
   /**
    * Chains result operations (flatMap).
    */
-  async andThen<T, U, E>(
-    result: Result<T, E>,
-    fn: (value: T) => Promise<Result<U, E>>
-  ): Promise<Result<U, E>> {
+  async andThen<T, U, E>(result: Result<T, E>, fn: (value: T) => Promise<Result<U, E>>): Promise<Result<U, E>> {
     if (result.success) {
       return fn(result.value);
     }

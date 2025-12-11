@@ -65,7 +65,7 @@ export function RecommendationGenerator({
       <form onSubmit={handleSubmit} className="space-y-4" data-test-id="recommendation-form">
         <div className="space-y-2">
           <label htmlFor="prompt" className="text-sm font-medium">
-            Opcjonalny prompt (np. "Polecam mi filmy science fiction z lat 80-tych")
+            Opcjonalny prompt (np. &ldquo;Polecam mi filmy science fiction z lat 80-tych&rdquo;)
           </label>
           <Textarea
             id="prompt"
@@ -89,7 +89,10 @@ export function RecommendationGenerator({
       </form>
 
       {error && (
-        <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive" data-test-id="recommendation-error">
+        <div
+          className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          data-test-id="recommendation-error"
+        >
           {error}
         </div>
       )}

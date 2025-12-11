@@ -82,9 +82,7 @@ export function RegisterForm() {
               <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div className="flex-1 space-y-2">
-              <h3 className="font-semibold text-green-900 dark:text-green-100">
-                Rejestracja prawie ukończona!
-              </h3>
+              <h3 className="font-semibold text-green-900 dark:text-green-100">Rejestracja prawie ukończona!</h3>
               <p className="text-sm text-green-800 dark:text-green-200">{successMessage}</p>
               <p className="text-sm text-green-700 dark:text-green-300">
                 Po kliknięciu w link aktywacyjny będziesz mógł się zalogować.

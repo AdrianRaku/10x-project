@@ -68,10 +68,17 @@ export function MovieSearch() {
         )}
       </div>
 
-      {isLoading && <div className="text-center text-sm text-muted-foreground" data-test-id="movie-search-loading">Wyszukiwanie...</div>}
+      {isLoading && (
+        <div className="text-center text-sm text-muted-foreground" data-test-id="movie-search-loading">
+          Wyszukiwanie...
+        </div>
+      )}
 
       {error && (
-        <div className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive" data-test-id="movie-search-error">
+        <div
+          className="rounded-md border border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          data-test-id="movie-search-error"
+        >
           {error}
         </div>
       )}
@@ -83,7 +90,10 @@ export function MovieSearch() {
       )}
 
       {!isLoading && !error && results.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" data-test-id="movie-search-results">
+        <div
+          className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+          data-test-id="movie-search-results"
+        >
           {results.map((movie) => (
             <MovieCard
               key={movie.tmdb_id}

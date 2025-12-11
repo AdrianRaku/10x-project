@@ -48,9 +48,7 @@ export class AIRecommendationStrategy implements RecommendationStrategy {
     const ratings = await ratingRepository.getUserRatings(userId);
 
     // 2. Build prompts
-    const promptBuilder = new PromptBuilder()
-      .withRatings(ratings)
-      .withUserContext(PromptBuilder.sanitize(userPrompt));
+    const promptBuilder = new PromptBuilder().withRatings(ratings).withUserContext(PromptBuilder.sanitize(userPrompt));
 
     const systemPrompt = promptBuilder.buildSystemPrompt();
     const userPromptText = promptBuilder.buildUserPrompt();
@@ -66,11 +64,7 @@ export class AIRecommendationStrategy implements RecommendationStrategy {
   /**
    * Calls OpenRouter AI to generate recommendations.
    */
-  private async callAI(
-    service: OpenRouterService,
-    systemPrompt: string,
-    userPrompt: string
-  ): Promise<string> {
+  private async callAI(service: OpenRouterService, systemPrompt: string, userPrompt: string): Promise<string> {
     const responseSchema = {
       type: "object",
       properties: {
@@ -133,9 +127,7 @@ export class AIRecommendationStrategy implements RecommendationStrategy {
 
     const validation = RecommendationsResponseSchema.safeParse(parsedContent);
     if (!validation.success) {
-      throw new AIResponseParsingError(
-        `AI response validation failed: ${validation.error.message}`
-      );
+      throw new AIResponseParsingError(`AI response validation failed: ${validation.error.message}`);
     }
 
     return validation.data.recommendations.map(
@@ -148,4 +140,3 @@ export class AIRecommendationStrategy implements RecommendationStrategy {
     );
   }
 }
-

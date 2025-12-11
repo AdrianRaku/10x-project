@@ -14,4 +14,3 @@ export interface RecommendationStrategy {
    */
   generate(userId: string, userPrompt?: string): Promise<RecommendationDto[]>;
 }
-

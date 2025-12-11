@@ -53,4 +53,3 @@ export class TMDbClient {
     return data;
   }
 }
-

@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '../../src/db/database.types';
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "../../src/db/database.types";
 
 /**
  * Creates a Supabase client for test cleanup operations
@@ -10,9 +10,7 @@ function createCleanupClient() {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error(
-      'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in .env.test file'
-    );
+    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in .env.test file");
   }
 
   return createClient<Database>(supabaseUrl, supabaseServiceKey, {
@@ -55,10 +53,7 @@ export async function cleanupUserData(userId: string): Promise<void> {
 
   try {
     // Delete AI recommendation requests
-    const { error: aiError } = await supabase
-      .from('ai_recommendation_requests')
-      .delete()
-      .eq('user_id', userId);
+    const { error: aiError } = await supabase.from("ai_recommendation_requests").delete().eq("user_id", userId);
 
     if (aiError) {
       console.error(`[Cleanup] Failed to delete ai_recommendation_requests:`, aiError);
@@ -67,10 +62,7 @@ export async function cleanupUserData(userId: string): Promise<void> {
     console.log(`[Cleanup] ✓ Deleted ai_recommendation_requests`);
 
     // Delete ratings
-    const { error: ratingsError } = await supabase
-      .from('ratings')
-      .delete()
-      .eq('user_id', userId);
+    const { error: ratingsError } = await supabase.from("ratings").delete().eq("user_id", userId);
 
     if (ratingsError) {
       console.error(`[Cleanup] Failed to delete ratings:`, ratingsError);
@@ -79,10 +71,7 @@ export async function cleanupUserData(userId: string): Promise<void> {
     console.log(`[Cleanup] ✓ Deleted ratings`);
 
     // Delete user lists
-    const { error: listsError } = await supabase
-      .from('user_lists')
-      .delete()
-      .eq('user_id', userId);
+    const { error: listsError } = await supabase.from("user_lists").delete().eq("user_id", userId);
 
     if (listsError) {
       console.error(`[Cleanup] Failed to delete user_lists:`, listsError);

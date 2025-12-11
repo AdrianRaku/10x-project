@@ -36,11 +36,7 @@ export const POST: APIRoute = async (context) => {
   // 3. Execute business logic
   try {
     const ratingsService = new RatingsService();
-    const result = await ratingsService.upsertRating(
-      validationResult.data,
-      authResult.userId,
-      context.locals.supabase
-    );
+    const result = await ratingsService.upsertRating(validationResult.data, authResult.userId, context.locals.supabase);
 
     const statusCode = result.wasCreated ? 201 : 200;
 
@@ -155,4 +151,3 @@ export const GET: APIRoute = async (context) => {
     );
   }
 };
-

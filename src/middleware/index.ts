@@ -36,10 +36,10 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
+  if (user && user.email) {
     // Store user data in locals
     locals.user = {
-      email: user.email!,
+      email: user.email,
       id: user.id,
       created_at: user.created_at,
     };
@@ -51,10 +51,10 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
   const response = await next();
 
   // Disable caching in test environment to ensure fresh data after cleanup
-  if (import.meta.env.MODE === 'test' || import.meta.env.DEV) {
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
+  if (import.meta.env.MODE === "test" || import.meta.env.DEV) {
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
   }
 
   return response;

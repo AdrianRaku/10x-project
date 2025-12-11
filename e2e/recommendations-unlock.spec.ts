@@ -1,9 +1,9 @@
-import { test, expect } from './fixtures/test-setup';
-import { LoginPage } from './pages/login.page';
-import { MainPage } from './pages/main.page';
-import { getTestCredentials } from './helpers/test-credentials';
+import { test, expect } from "./fixtures/test-setup";
+import { LoginPage } from "./pages/login.page";
+import { MainPage } from "./pages/main.page";
+import { getTestCredentials } from "./helpers/test-credentials";
 
-test.describe('Recommendations Unlock Scenario', () => {
+test.describe("Recommendations Unlock Scenario", () => {
   let loginPage: LoginPage;
   let mainPage: MainPage;
   const credentials = getTestCredentials();
@@ -13,7 +13,7 @@ test.describe('Recommendations Unlock Scenario', () => {
     mainPage = new MainPage(page);
   });
 
-  test('user without 10 ratings cannot generate recommendations', async ({ page, context }) => {
+  test("user without 10 ratings cannot generate recommendations", async ({ page, context }) => {
     // Step 1: Clear all cookies and storage to ensure fresh start after cleanup
     await context.clearCookies();
     await context.clearPermissions();
@@ -25,7 +25,7 @@ test.describe('Recommendations Unlock Scenario', () => {
     await loginPage.login(credentials.username, credentials.password);
 
     // Wait for navigation away from login page (redirect after successful login)
-    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+    await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 10000 });
 
     // Step 4: Verify user is on main page
     await expect(mainPage.heading).toBeVisible();
@@ -50,13 +50,13 @@ test.describe('Recommendations Unlock Scenario', () => {
     expect(progress.current).toBe(0);
   });
 
-  test('user can rate movies and unlock recommendations after 10 ratings', async ({ page }) => {
+  test("user can rate movies and unlock recommendations after 10 ratings", async ({ page }) => {
     test.setTimeout(180000); // 3 minutes timeout for this test
 
     // Step 1: Login
     await loginPage.goto();
     await loginPage.login(credentials.username, credentials.password);
-    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+    await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 10000 });
 
     // Step 2: Verify initial state - recommendations locked
     expect(await mainPage.isRecommendationsLocked()).toBe(true);
@@ -95,21 +95,23 @@ test.describe('Recommendations Unlock Scenario', () => {
           console.log(`Attempt ${attempt + 1} failed: ${error.message}`);
           attempt++;
           try {
-            await page.goto('/');
+            await page.goto("/");
             await page.waitForTimeout(500);
-          } catch {}
+          } catch {
+            // Ignore navigation errors
+          }
         }
       }
 
       // Check progress after batch
-      console.log('\nChecking progress...');
-      await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 15000 });
+      console.log("\nChecking progress...");
+      await page.goto("/", { waitUntil: "domcontentloaded", timeout: 15000 });
       await page.waitForTimeout(1000);
 
       // Check if recommendations are unlocked (progress bar disappears when unlocked)
       const isUnlocked = await mainPage.isRecommendationsUnlocked();
       if (isUnlocked) {
-        console.log('✓ Threshold reached - recommendations unlocked!');
+        console.log("✓ Threshold reached - recommendations unlocked!");
         currentProgress = initialProgress.total; // Set to threshold
         break;
       }
@@ -128,11 +130,11 @@ test.describe('Recommendations Unlock Scenario', () => {
 
     // Step 5: Verify recommendations are now unlocked
     // We already reloaded after the last batch, so just check if visible
-    console.log('Verifying recommendations section is now visible...');
-    await mainPage.recommendationsSection.waitFor({ state: 'visible', timeout: 5000 });
+    console.log("Verifying recommendations section is now visible...");
+    await mainPage.recommendationsSection.waitFor({ state: "visible", timeout: 5000 });
 
     expect(await mainPage.isRecommendationsUnlocked()).toBe(true);
-    console.log('✓ Recommendations unlocked!');
+    console.log("✓ Recommendations unlocked!");
 
     // Step 6: Verify recommendation generator is visible
     await expect(mainPage.recommendationsSection).toBeVisible();
@@ -141,21 +143,21 @@ test.describe('Recommendations Unlock Scenario', () => {
     // Step 7: Verify generate button is enabled
     expect(await mainPage.recommendationGenerator.isButtonEnabled()).toBe(true);
 
-    console.log('✓ Test passed - recommendations panel unlocked and ready!');
+    console.log("✓ Test passed - recommendations panel unlocked and ready!");
   });
 
-  test('displays correct progress bar as user rates movies', async ({ page }) => {
+  test("displays correct progress bar as user rates movies", async ({ page }) => {
     // Step 1: Login
     await loginPage.goto();
     await loginPage.login(credentials.username, credentials.password);
-    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+    await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 10000 });
 
     // Step 2: Get initial progress
     const initialProgress = await mainPage.getRatingsProgress();
     const initialCurrent = initialProgress.current;
 
     // Step 3: Rate one movie
-    await mainPage.movieSearch.searchAndWaitForResults('Inception');
+    await mainPage.movieSearch.searchAndWaitForResults("Inception");
     const movieCard = await mainPage.movieSearch.getFirstMovieCard();
     await movieCard.rateMovie(9);
     await page.waitForTimeout(500);
@@ -168,19 +170,19 @@ test.describe('Recommendations Unlock Scenario', () => {
     // Step 5: Verify progress bar fill width increased
     await expect(mainPage.ratingsProgressFill).toBeVisible();
     const progressPercentage = (newProgress.current / newProgress.total) * 100;
-    const fillStyle = await mainPage.ratingsProgressFill.getAttribute('style');
+    const fillStyle = await mainPage.ratingsProgressFill.getAttribute("style");
     expect(fillStyle).toContain(`${progressPercentage}%`);
   });
 
-  test('generate button is disabled when recommendations limit is reached', async ({ page }) => {
+  test("generate button is disabled when recommendations limit is reached", async ({ page }) => {
     // This test assumes user has already unlocked recommendations
     await loginPage.goto();
     await loginPage.login(credentials.username, credentials.password);
-    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+    await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 10000 });
 
     // Skip if recommendations are not unlocked
     const isUnlocked = await mainPage.isRecommendationsUnlocked();
-    test.skip(!isUnlocked, 'Recommendations not unlocked for this user');
+    test.skip(!isUnlocked, "Recommendations not unlocked for this user");
 
     // Generate recommendations until limit is reached
     let attempts = 0;

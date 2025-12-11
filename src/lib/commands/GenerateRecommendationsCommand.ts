@@ -51,10 +51,7 @@ export class GenerateRecommendationsCommand {
 
     // 2. Enrich with TMDb data
     const moviesService = new MoviesService(params.tmdbApiKey);
-    const enrichedRecommendations = await this.enrichWithTMDbData(
-      aiRecommendations,
-      moviesService
-    );
+    const enrichedRecommendations = await this.enrichWithTMDbData(aiRecommendations, moviesService);
 
     const duration = Date.now() - startTime;
 
@@ -99,6 +96,7 @@ export class GenerateRecommendationsCommand {
 /**
  * Error handler for recommendations command.
  */
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class RecommendationsErrorHandler {
   /**
    * Handles known business errors and returns appropriate HTTP response.
@@ -172,4 +170,3 @@ export class RecommendationsErrorHandler {
     );
   }
 }
-

@@ -84,7 +84,11 @@ export function LoginForm() {
             className={errors.email ? "border-destructive" : ""}
             data-test-id="login-email-input"
           />
-          {errors.email && <p className="text-sm text-destructive" data-test-id="login-email-error">{errors.email}</p>}
+          {errors.email && (
+            <p className="text-sm text-destructive" data-test-id="login-email-error">
+              {errors.email}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -100,7 +104,11 @@ export function LoginForm() {
             className={errors.password ? "border-destructive" : ""}
             data-test-id="login-password-input"
           />
-          {errors.password && <p className="text-sm text-destructive" data-test-id="login-password-error">{errors.password}</p>}
+          {errors.password && (
+            <p className="text-sm text-destructive" data-test-id="login-password-error">
+              {errors.password}
+            </p>
+          )}
         </div>
       </div>
 

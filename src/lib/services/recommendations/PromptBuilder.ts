@@ -28,9 +28,7 @@ export class PromptBuilder {
    * Builds the system prompt for AI.
    */
   buildSystemPrompt(): string {
-    const ratingsText = this.ratings
-      .map((r) => `- TMDb ID ${r.tmdb_id}: Rating ${r.rating}/10`)
-      .join("\n");
+    const ratingsText = this.ratings.map((r) => `- TMDb ID ${r.tmdb_id}: Rating ${r.rating}/10`).join("\n");
 
     return `You are an expert movie recommendation system. Based on the user's rating history below, suggest 5 movies they would love.
 
@@ -60,4 +58,3 @@ Provide 5 diverse movie recommendations with valid TMDb IDs, titles, and release
     return prompt.replace(/[<>]/g, "").trim();
   }
 }
-

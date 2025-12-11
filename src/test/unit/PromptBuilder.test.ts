@@ -10,9 +10,7 @@ describe("PromptBuilder", () => {
         { tmdb_id: 3, rating: 2 },
       ];
 
-      const prompt = new PromptBuilder()
-        .withRatings(ratings)
-        .buildSystemPrompt();
+      const prompt = new PromptBuilder().withRatings(ratings).buildSystemPrompt();
 
       expect(prompt).toContain("TMDb ID 1: Rating 9/10");
       expect(prompt).toContain("TMDb ID 2: Rating 5/10");
@@ -21,9 +19,7 @@ describe("PromptBuilder", () => {
     });
 
     it("should build system prompt with empty ratings", () => {
-      const prompt = new PromptBuilder()
-        .withRatings([])
-        .buildSystemPrompt();
+      const prompt = new PromptBuilder().withRatings([]).buildSystemPrompt();
 
       expect(prompt).toContain("User's rating history:");
       expect(prompt).not.toContain("- TMDb ID");
@@ -72,9 +68,7 @@ describe("PromptBuilder", () => {
     it("should allow method chaining", () => {
       const ratings = [{ tmdb_id: 1, rating: 8 }];
 
-      const builder = new PromptBuilder()
-        .withRatings(ratings)
-        .withUserContext("test");
+      const builder = new PromptBuilder().withRatings(ratings).withUserContext("test");
 
       expect(builder).toBeInstanceOf(PromptBuilder);
 
@@ -86,4 +80,3 @@ describe("PromptBuilder", () => {
     });
   });
 });
-

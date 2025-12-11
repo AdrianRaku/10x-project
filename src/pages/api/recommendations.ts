@@ -87,4 +87,3 @@ export const POST: APIRoute = async (context) => {
     return RecommendationsErrorHandler.handleError(error, duration);
   }
 };
-

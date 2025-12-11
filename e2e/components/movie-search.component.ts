@@ -1,5 +1,5 @@
-import { type Page, type Locator } from '@playwright/test';
-import { MovieCardComponent } from './movie-card.component';
+import { type Page, type Locator } from "@playwright/test";
+import { MovieCardComponent } from "./movie-card.component";
 
 export class MovieSearchComponent {
   readonly page: Page;
@@ -9,60 +9,60 @@ export class MovieSearchComponent {
   readonly errorMessage: Locator;
   readonly noResultsMessage: Locator;
   readonly resultsContainer: Locator;
-  private ratedMovieIds: Set<number> = new Set();
+  private ratedMovieIds = new Set<number>();
 
   // Diverse movie search queries that are likely to return different movies
   private readonly diverseSearchQueries = [
-    'Inception',
-    'Interstellar',
-    'Avatar',
-    'Titanic',
-    'Gladiator',
-    'Forrest Gump',
-    'Pulp Fiction',
-    'Fight Club',
-    'Dark Knight',
-    'Godfather',
-    'Shawshank',
-    'Schindler',
-    'Lord of the Rings',
-    'Star Wars',
-    'Jurassic Park',
-    'Django Unchained',
-    'Inglourious Basterds',
-    'Goodfellas',
-    'Prestige',
-    'Departed',
-    'Green Mile',
-    'Seven',
-    'Silence of the Lambs',
-    'American Beauty',
-    'Usual Suspects',
-    'Memento',
-    'Leon Professional',
-    'Saving Private Ryan',
-    'Terminator',
-    'Alien',
-    'Blade Runner',
-    'Die Hard',
-    'Predator',
-    'Rocky',
-    'Rambo',
-    'Indiana Jones',
-    'Back to the Future',
-    'Ghostbusters',
-    'Top Gun',
-    'Mission Impossible'
+    "Inception",
+    "Interstellar",
+    "Avatar",
+    "Titanic",
+    "Gladiator",
+    "Forrest Gump",
+    "Pulp Fiction",
+    "Fight Club",
+    "Dark Knight",
+    "Godfather",
+    "Shawshank",
+    "Schindler",
+    "Lord of the Rings",
+    "Star Wars",
+    "Jurassic Park",
+    "Django Unchained",
+    "Inglourious Basterds",
+    "Goodfellas",
+    "Prestige",
+    "Departed",
+    "Green Mile",
+    "Seven",
+    "Silence of the Lambs",
+    "American Beauty",
+    "Usual Suspects",
+    "Memento",
+    "Leon Professional",
+    "Saving Private Ryan",
+    "Terminator",
+    "Alien",
+    "Blade Runner",
+    "Die Hard",
+    "Predator",
+    "Rocky",
+    "Rambo",
+    "Indiana Jones",
+    "Back to the Future",
+    "Ghostbusters",
+    "Top Gun",
+    "Mission Impossible",
   ];
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page.getByTestId('movie-search');
-    this.searchInput = page.getByTestId('movie-search-input');
-    this.loadingIndicator = page.getByTestId('movie-search-loading');
-    this.errorMessage = page.getByTestId('movie-search-error');
-    this.noResultsMessage = page.getByTestId('movie-search-no-results');
-    this.resultsContainer = page.getByTestId('movie-search-results');
+    this.container = page.getByTestId("movie-search");
+    this.searchInput = page.getByTestId("movie-search-input");
+    this.loadingIndicator = page.getByTestId("movie-search-loading");
+    this.errorMessage = page.getByTestId("movie-search-error");
+    this.noResultsMessage = page.getByTestId("movie-search-no-results");
+    this.resultsContainer = page.getByTestId("movie-search-results");
   }
 
   async search(query: string) {
@@ -75,7 +75,9 @@ export class MovieSearchComponent {
   async clearSearch() {
     await this.searchInput.clear();
     // Wait for results to be cleared
-    await this.resultsContainer.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
+    await this.resultsContainer.waitFor({ state: "detached", timeout: 2000 }).catch(() => {
+      // Ignore timeout - results may already be cleared
+    });
   }
 
   async waitForResults() {
@@ -83,11 +85,11 @@ export class MovieSearchComponent {
     // This will resolve as soon as any of these conditions is met
     try {
       await Promise.race([
-        this.resultsContainer.waitFor({ state: 'attached', timeout: 15000 }),
-        this.errorMessage.waitFor({ state: 'attached', timeout: 15000 }),
-        this.noResultsMessage.waitFor({ state: 'attached', timeout: 15000 })
+        this.resultsContainer.waitFor({ state: "attached", timeout: 15000 }),
+        this.errorMessage.waitFor({ state: "attached", timeout: 15000 }),
+        this.noResultsMessage.waitFor({ state: "attached", timeout: 15000 }),
       ]);
-    } catch (error) {
+    } catch {
       // Log current state for debugging
       const isLoading = await this.isLoading();
       const hasError = await this.hasError();
@@ -99,22 +101,28 @@ export class MovieSearchComponent {
   }
 
   async waitForLoading() {
-    await this.loadingIndicator.waitFor({ state: 'visible' });
+    await this.loadingIndicator.waitFor({ state: "visible" });
   }
 
   async waitForSuccessfulResults() {
     // Wait for either loading to appear or results to appear immediately
     await Promise.race([
-      this.loadingIndicator.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {}),
-      this.resultsContainer.waitFor({ state: 'attached', timeout: 3000 }).catch(() => {}),
-      this.page.waitForTimeout(1000) // Minimum wait for debounce + network
+      this.loadingIndicator.waitFor({ state: "visible", timeout: 3000 }).catch(() => {
+        // Ignore - may load instantly
+      }),
+      this.resultsContainer.waitFor({ state: "attached", timeout: 3000 }).catch(() => {
+        // Ignore - may still be loading
+      }),
+      this.page.waitForTimeout(1000), // Minimum wait for debounce + network
     ]);
 
     // Now wait for search to complete - results should be visible
-    await this.resultsContainer.waitFor({ state: 'visible', timeout: 15000 });
+    await this.resultsContainer.waitFor({ state: "visible", timeout: 15000 });
 
     // Ensure loading is done
-    await this.loadingIndicator.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
+    await this.loadingIndicator.waitFor({ state: "detached", timeout: 2000 }).catch(() => {
+      // Ignore - loading may already be done
+    });
   }
 
   async isLoading(): Promise<boolean> {
@@ -143,12 +151,12 @@ export class MovieSearchComponent {
 
   async getFirstMovieCard(): Promise<MovieCardComponent> {
     const firstCard = this.resultsContainer.locator('[data-test-id^="movie-card-"]').first();
-    await firstCard.waitFor({ state: 'visible', timeout: 5000 });
-    const testId = await firstCard.getAttribute('data-test-id');
-    const tmdbId = parseInt(testId?.replace('movie-card-', '') || '0');
+    await firstCard.waitFor({ state: "visible", timeout: 5000 });
+    const testId = await firstCard.getAttribute("data-test-id");
+    const tmdbId = parseInt(testId?.replace("movie-card-", "") || "0");
 
     if (!tmdbId || tmdbId === 0) {
-      throw new Error('Failed to extract movie ID from first card');
+      throw new Error("Failed to extract movie ID from first card");
     }
 
     return new MovieCardComponent(this.page, tmdbId);
@@ -159,8 +167,8 @@ export class MovieSearchComponent {
     const movieCards: MovieCardComponent[] = [];
 
     for (const card of cards) {
-      const testId = await card.getAttribute('data-test-id');
-      const tmdbId = parseInt(testId?.replace('movie-card-', '') || '0');
+      const testId = await card.getAttribute("data-test-id");
+      const tmdbId = parseInt(testId?.replace("movie-card-", "") || "0");
       movieCards.push(new MovieCardComponent(this.page, tmdbId));
     }
 
@@ -172,7 +180,7 @@ export class MovieSearchComponent {
 
     // Wait for network request to complete
     const response = await this.page.waitForResponse(
-      (response) => response.url().includes('/api/movies/search') && response.status() === 200,
+      (response) => response.url().includes("/api/movies/search") && response.status() === 200,
       { timeout: 15000 }
     );
 
@@ -185,7 +193,7 @@ export class MovieSearchComponent {
     }
 
     // Wait for results to be rendered
-    await this.resultsContainer.waitFor({ state: 'visible', timeout: 5000 });
+    await this.resultsContainer.waitFor({ state: "visible", timeout: 5000 });
 
     // Verify we have at least one movie card
     const count = await this.getResultsCount();

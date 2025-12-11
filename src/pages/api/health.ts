@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ locals }) => {
     }
 
     // Test database connection by querying ratings table
-    const { data, error } = await locals.supabase.from("ratings").select("count").limit(1);
+    const { error } = await locals.supabase.from("ratings").select("count").limit(1);
 
     if (error) {
       return new Response(

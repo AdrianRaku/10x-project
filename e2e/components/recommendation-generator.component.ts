@@ -1,4 +1,4 @@
-import { type Page, type Locator } from '@playwright/test';
+import { type Page, type Locator } from "@playwright/test";
 
 export class RecommendationGeneratorComponent {
   readonly page: Page;
@@ -12,13 +12,13 @@ export class RecommendationGeneratorComponent {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page.getByTestId('recommendation-generator');
-    this.form = page.getByTestId('recommendation-form');
-    this.promptInput = page.getByTestId('recommendation-prompt-input');
-    this.usageCounter = page.getByTestId('recommendations-usage-counter');
-    this.generateButton = page.getByTestId('generate-recommendations-button');
-    this.errorMessage = page.getByTestId('recommendation-error');
-    this.loadingIndicator = page.getByTestId('recommendation-loading');
+    this.container = page.getByTestId("recommendation-generator");
+    this.form = page.getByTestId("recommendation-form");
+    this.promptInput = page.getByTestId("recommendation-prompt-input");
+    this.usageCounter = page.getByTestId("recommendations-usage-counter");
+    this.generateButton = page.getByTestId("generate-recommendations-button");
+    this.errorMessage = page.getByTestId("recommendation-error");
+    this.loadingIndicator = page.getByTestId("recommendation-loading");
   }
 
   async generateRecommendations(prompt?: string) {
@@ -42,13 +42,13 @@ export class RecommendationGeneratorComponent {
 
   async waitForRecommendations() {
     // Wait for loading to start (with timeout in case it's too fast)
-    await this.loadingIndicator.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {
-      console.log('Loading indicator did not appear (might be too fast)');
+    await this.loadingIndicator.waitFor({ state: "visible", timeout: 3000 }).catch(() => {
+      console.log("Loading indicator did not appear (might be too fast)");
     });
 
     // Wait for loading to finish (with timeout in case API is slow)
-    await this.loadingIndicator.waitFor({ state: 'hidden', timeout: 30000 }).catch(() => {
-      console.log('Loading indicator did not disappear within 30s');
+    await this.loadingIndicator.waitFor({ state: "hidden", timeout: 30000 }).catch(() => {
+      console.log("Loading indicator did not disappear within 30s");
     });
 
     // Extra wait for results to render
@@ -64,7 +64,7 @@ export class RecommendationGeneratorComponent {
   }
 
   async getErrorText(): Promise<string> {
-    return await this.errorMessage.textContent() || '';
+    return (await this.errorMessage.textContent()) || "";
   }
 
   async isButtonDisabled(): Promise<boolean> {

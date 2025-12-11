@@ -79,4 +79,3 @@ export const requireAuth = (
 
   return { success: true, userId: user.id };
 };
-

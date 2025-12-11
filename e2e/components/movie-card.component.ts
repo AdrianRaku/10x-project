@@ -1,5 +1,5 @@
-import { type Page, type Locator } from '@playwright/test';
-import { MovieRatingComponent } from './movie-rating.component';
+import { type Page, type Locator } from "@playwright/test";
+import { MovieRatingComponent } from "./movie-rating.component";
 
 export class MovieCardComponent {
   readonly page: Page;
@@ -14,8 +14,8 @@ export class MovieCardComponent {
     this.page = page;
     this.tmdbId = tmdbId;
     this.card = page.getByTestId(`movie-card-${tmdbId}`);
-    this.link = this.card.getByTestId('movie-card-link');
-    this.title = this.card.getByRole('heading');
+    this.link = this.card.getByTestId("movie-card-link");
+    this.title = this.card.getByRole("heading");
     this.year = this.card.locator('[class*="CardDescription"]');
     this.rating = new MovieRatingComponent(page, this.card);
   }
@@ -25,11 +25,11 @@ export class MovieCardComponent {
   }
 
   async getTitle(): Promise<string> {
-    return await this.title.textContent() || '';
+    return (await this.title.textContent()) || "";
   }
 
   async getYear(): Promise<string> {
-    return await this.year.textContent() || '';
+    return (await this.year.textContent()) || "";
   }
 
   async rateMovie(rating: number) {
@@ -51,6 +51,6 @@ export class MovieCardComponent {
   }
 
   async waitForVisible() {
-    await this.card.waitFor({ state: 'visible' });
+    await this.card.waitFor({ state: "visible" });
   }
 }

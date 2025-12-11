@@ -6,10 +6,9 @@ import { useMovieLists } from "./hooks/useMovieLists";
 
 interface MovieListActionsProps {
   tmdbId: number;
-  movieTitle: string;
 }
 
-export function MovieListActions({ tmdbId, movieTitle }: MovieListActionsProps) {
+export function MovieListActions({ tmdbId }: MovieListActionsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { isFavorite, isWatchlisted, isLoading, toggleFavorite, toggleWatchlist } = useMovieLists({ tmdbId });
 
@@ -33,11 +32,7 @@ export function MovieListActions({ tmdbId, movieTitle }: MovieListActionsProps) 
           disabled={isLoading}
           data-test-id={`movie-list-actions-${tmdbId}`}
         >
-          {isLoading ? (
-            <Loader2 className="size-4 mr-1 animate-spin" />
-          ) : (
-            <ListPlus className="size-4 mr-1" />
-          )}
+          {isLoading ? <Loader2 className="size-4 mr-1 animate-spin" /> : <ListPlus className="size-4 mr-1" />}
           Lista
         </Button>
       </PopoverTrigger>

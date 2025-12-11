@@ -22,7 +22,10 @@ export function MovieCard({ tmdb_id, title, posterPath, releaseDate, year }: Mov
   const posterUrl = posterPath ? `${TMDB_IMAGE_BASE_URL}${posterPath}` : null;
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg flex flex-col" data-test-id={`movie-card-${tmdb_id}`}>
+    <Card
+      className="overflow-hidden transition-all hover:shadow-lg flex flex-col"
+      data-test-id={`movie-card-${tmdb_id}`}
+    >
       <a href={`/movie/${tmdb_id}`} className="group" data-test-id="movie-card-link">
         <div className="aspect-[2/3] overflow-hidden bg-muted">
           {posterUrl ? (

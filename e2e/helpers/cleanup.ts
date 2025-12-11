@@ -13,7 +13,10 @@ function createCleanupClient() {
   if (process.env.CI) {
     console.log("[Cleanup Debug] SUPABASE_URL:", supabaseUrl ? "SET" : "NOT SET");
     console.log("[Cleanup Debug] SUPABASE_SERVICE_ROLE_KEY:", supabaseServiceKey ? "SET" : "NOT SET");
-    console.log("[Cleanup Debug] All env keys:", Object.keys(process.env).filter(k => k.includes("SUPABASE")));
+    console.log(
+      "[Cleanup Debug] All env keys:",
+      Object.keys(process.env).filter((k) => k.includes("SUPABASE"))
+    );
   }
 
   if (!supabaseUrl || !supabaseServiceKey) {

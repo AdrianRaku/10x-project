@@ -11,10 +11,15 @@ function createCleanupClient() {
 
   // Debug: log available env vars (for CI troubleshooting)
   if (process.env.CI) {
-    console.log("[Cleanup Debug] SUPABASE_URL:", supabaseUrl ? "SET" : "NOT SET");
-    console.log("[Cleanup Debug] SUPABASE_SERVICE_ROLE_KEY:", supabaseServiceKey ? "SET" : "NOT SET");
+    console.log("[Cleanup Debug] SUPABASE_URL:", supabaseUrl ? `SET (${supabaseUrl})` : "NOT SET");
     console.log(
-      "[Cleanup Debug] All env keys:",
+      "[Cleanup Debug] SUPABASE_SERVICE_ROLE_KEY:",
+      supabaseServiceKey
+        ? `SET (length: ${supabaseServiceKey.length}, starts with: ${supabaseServiceKey.substring(0, 20)}...)`
+        : "NOT SET"
+    );
+    console.log(
+      "[Cleanup Debug] All SUPABASE env keys:",
       Object.keys(process.env).filter((k) => k.includes("SUPABASE"))
     );
   }
